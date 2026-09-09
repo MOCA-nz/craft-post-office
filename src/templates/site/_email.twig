@@ -1,0 +1,33 @@
+{#
+  Default notification email.
+
+  Used when a notification has no template of its own. Override by copying to
+  templates/capture/_email.twig, or point the notification at your own template path.
+
+  Available: submission, form, values (keyed by handle), rows (label/value pairs for every
+  field marked "include in email").
+#}
+<!doctype html>
+<html>
+<body style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#222;line-height:1.5">
+  <h2 style="margin:0 0 16px">{{ form.name }}</h2>
+
+  <table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;max-width:600px">
+    {% for row in rows %}
+      <tr>
+        <th align="left" valign="top" style="padding:8px 16px 8px 0;border-bottom:1px solid #eee;width:35%">
+          {{ row.label }}
+        </th>
+        <td valign="top" style="padding:8px 0;border-bottom:1px solid #eee">
+          {{ row.value is empty ? '—' : row.value|nl2br }}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+  <p style="color:#777;font-size:13px;margin-top:24px">
+    {{ 'Submitted'|t('capture') }} {{ submission.dateCreated|datetime('short') }}
+    {%- if submission.ipAddress %} {{ 'from'|t('capture') }} {{ submission.ipAddress }}{% endif %}
+  </p>
+</body>
+</html>

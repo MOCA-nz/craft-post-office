@@ -1,0 +1,58 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Capture Settings'|t('capture') %}
+{% set fullPageForm = not readOnly %}
+{% set crumbs = [{ label: 'Capture'|t('capture'), url: url('capture/forms') }] %}
+
+{% block content %}
+  {{ actionInput('capture/settings/save') }}
+
+  <p class="light">
+    {{ 'Keys are stored in project config, so give each one an environment variable reference rather than the key itself. Which of these run is set per form, on the form’s Settings tab.'|t('capture') }}
+  </p>
+
+  <h2>{{ 'reCAPTCHA'|t('capture') }}</h2>
+
+  {{ forms.autosuggestField({
+    label: 'Site key'|t('capture'),
+    name: 'recaptchaSiteKey',
+    value: settings.recaptchaSiteKey,
+    suggestEnvVars: true,
+    disabled: readOnly,
+  }) }}
+
+  {{ forms.autosuggestField({
+    label: 'Secret key'|t('capture'),
+    name: 'recaptchaSecretKey',
+    value: settings.recaptchaSecretKey,
+    suggestEnvVars: true,
+    disabled: readOnly,
+  }) }}
+
+  <hr>
+
+  <h2>{{ 'Turnstile'|t('capture') }}</h2>
+
+  {{ forms.autosuggestField({
+    label: 'Site key'|t('capture'),
+    name: 'turnstileSiteKey',
+    value: settings.turnstileSiteKey,
+    suggestEnvVars: true,
+    disabled: readOnly,
+  }) }}
+
+  {{ forms.autosuggestField({
+    label: 'Secret key'|t('capture'),
+    name: 'turnstileSecretKey',
+    value: settings.turnstileSecretKey,
+    suggestEnvVars: true,
+    disabled: readOnly,
+  }) }}
+
+  {% if readOnly %}
+    <p class="warning">
+      {{ 'Administrative changes are disabled in this environment.'|t('capture') }}
+    </p>
+  {% endif %}
+{% endblock %}

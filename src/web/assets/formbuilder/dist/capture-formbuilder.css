@@ -1,0 +1,85 @@
+/* Capture form builder */
+
+.capture-field-list {
+  margin: 0 0 14px;
+  padding: 0;
+  list-style: none;
+}
+
+.capture-field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: -1px;
+  background: var(--white);
+  border: 1px solid var(--hairline-color);
+  border-radius: var(--small-border-radius);
+  cursor: pointer;
+}
+
+.capture-field:hover {
+  background: var(--gray-050);
+}
+
+.capture-field .move {
+  cursor: move;
+  flex: 0 0 auto;
+}
+
+.capture-field-summary {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* It is a <button> for keyboard access; strip the button chrome. */
+  appearance: none;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.capture-field-summary:focus-visible {
+  outline: 2px solid var(--focus-ring-color, #127fbf);
+  outline-offset: 2px;
+}
+
+.capture-field-label {
+  font-weight: bold;
+  display: block;
+}
+
+.capture-field-meta {
+  color: var(--medium-text-color);
+  font-size: 12px;
+  display: block;
+}
+
+.capture-field-required {
+  flex: 0 0 auto;
+  color: var(--error-color);
+  font-weight: bold;
+}
+
+.capture-field-modal {
+  width: 520px;
+  max-width: calc(100vw - 40px);
+}
+
+.capture-field-modal .body {
+  padding: 24px;
+  max-height: min(70vh, 640px);
+  overflow-y: auto;
+}
+
+.capture-empty {
+  padding: 24px;
+  text-align: center;
+  color: var(--medium-text-color);
+  border: 1px dashed var(--hairline-color);
+  border-radius: var(--small-border-radius);
+  margin-bottom: 14px;
+}

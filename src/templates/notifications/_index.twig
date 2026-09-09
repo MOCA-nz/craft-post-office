@@ -1,0 +1,44 @@
+{% extends '_layouts/cp' %}
+
+{% set title = 'Sent Notifications'|t('capture') %}
+
+{% block content %}
+  {% if rows is empty %}
+    <p class="light">{{ 'Nothing has been sent yet.'|t('capture') }}</p>
+  {% else %}
+    <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th scope="col">{{ 'Date'|t('capture') }}</th>
+          <th scope="col">{{ 'Time'|t('capture') }}</th>
+          <th scope="col">{{ 'Recipient'|t('capture') }}</th>
+          <th scope="col">{{ 'Status'|t('capture') }}</th>
+          <th scope="col">{{ 'Submission'|t('capture') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          {% set sent = row.dateCreated|datetime('short') %}
+          <tr>
+            <td data-title="{{ 'Date'|t('capture') }}">{{ row.dateCreated|date('short') }}</td>
+            <td data-title="{{ 'Time'|t('capture') }}">{{ row.dateCreated|time('short') }}</td>
+            <td data-title="{{ 'Recipient'|t('capture') }}">{{ row.recipientEmail }}</td>
+            <td data-title="{{ 'Status'|t('capture') }}">
+              <span class="status {{ row.status == 'sent' ? 'live' : 'off' }}"></span>
+              {{ row.status == 'sent' ? 'Sent'|t('capture') : 'Failed'|t('capture') }}
+              {%- if row.error %}<br><span class="error code">{{ row.error }}</span>{% endif %}
+            </td>
+            <td data-title="{{ 'Submission'|t('capture') }}">
+              {% set submission = submissions[row.submissionId] ?? null %}
+              {% if submission %}
+                <a href="{{ url('capture/submissions/' ~ submission.id) }}">{{ submission.uiLabel }}</a>
+              {% else %}
+                <span class="light">{{ 'Deleted'|t('capture') }}</span>
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

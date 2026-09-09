@@ -1,0 +1,103 @@
+{#
+  Renders a whole form.
+
+  Override by copying this file to templates/capture/_form.twig in your project. Everything
+  it relies on is passed in, so an override can restructure the markup freely.
+#}
+{% set submission = captureSubmission ?? null %}
+{% set values = submission ? submission.values : {} %}
+{% set errors = submission ? submission.fieldErrors : {} %}
+{% set isAjax = form.successBehavior == 'ajax' %}
+
+<form method="post"
+      accept-charset="UTF-8"
+      class="capture-form"
+      data-capture-form="{{ form.handle }}"
+      {% if isAjax %}data-capture-ajax{% endif %}>
+  {{ csrfInput() }}
+  {{ actionInput('capture/submit') }}
+  {{ hiddenInput('formHandle', form.handle) }}
+
+  {% if form.honeypotEnabled %}
+    {# Bots fill anything they find. Hidden from people, and from screen readers. #}
+    <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
+      <label>{{ 'Leave this field empty'|t('capture') }}
+        <input type="text" name="{{ honeypotField }}" value="" tabindex="-1" autocomplete="off">
+      </label>
+    </div>
+    <input type="hidden" name="{{ timestampField }}" value="{{ timestamp }}">
+  {% endif %}
+
+  <div class="capture-message" data-capture-message hidden></div>
+
+  {% for field in form.fields %}
+    {% include 'capture/_field' with {
+      form: form,
+      field: field,
+      values: values,
+      errors: errors,
+    } only %}
+  {% endfor %}
+
+  <button type="submit" class="capture-submit">{{ 'Send'|t('capture') }}</button>
+</form>
+
+{% if isAjax %}
+  {% js %}
+    (function () {
+      var form = document.querySelector('[data-capture-form="{{ form.handle }}"][data-capture-ajax]');
+      if (!form || form.dataset.captureBound) return;
+      form.dataset.captureBound = '1';
+
+      var message = form.querySelector('[data-capture-message]');
+      var button = form.querySelector('[type=submit]');
+
+      function clearErrors() {
+        form.querySelectorAll('[data-capture-error]').forEach(function (el) {
+          el.textContent = '';
+          el.hidden = true;
+          var wrap = el.closest('.capture-field');
+          if (wrap) wrap.classList.remove('capture-field--error');
+        });
+      }
+
+      form.addEventListener('submit', function (ev) {
+        ev.preventDefault();
+        clearErrors();
+        button.disabled = true;
+
+        fetch(form.action || window.location.href, {
+          method: 'POST',
+          body: new FormData(form),
+          headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+        })
+          .then(function (r) { return r.json(); })
+          .then(function (data) {
+            message.hidden = false;
+            message.textContent = data.message || '';
+            message.className = 'capture-message capture-message--' + (data.success ? 'success' : 'error');
+
+            if (data.success) {
+              form.reset();
+              return;
+            }
+
+            Object.keys(data.errors || {}).forEach(function (handle) {
+              var el = form.querySelector('[data-capture-error="' + handle + '"]');
+              if (!el) return;
+              el.textContent = data.errors[handle][0];
+              el.hidden = false;
+              var wrap = el.closest('.capture-field');
+              if (wrap) wrap.classList.add('capture-field--error');
+            });
+          })
+          .catch(function () {
+            message.hidden = false;
+            message.className = 'capture-message capture-message--error';
+            message.textContent = '{{ 'Something went wrong. Please try again.'|t('capture') }}';
+          })
+          .finally(function () { button.disabled = false; });
+      });
+    })();
+  {% endjs %}
+{% endif %}

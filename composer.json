@@ -1,0 +1,43 @@
+{
+  "name": "moca-nz/craft-capture",
+  "description": "A contact form builder for Craft CMS. Build forms in the control panel, store submissions as elements, and send notifications from your own Twig templates.",
+  "type": "craft-plugin",
+  "license": "MIT",
+  "keywords": [
+    "craft",
+    "craftcms",
+    "craft-plugin",
+    "forms",
+    "contact-form",
+    "form-builder"
+  ],
+  "authors": [
+    {
+      "name": "MOCA",
+      "homepage": "https://www.moca.co.nz/"
+    }
+  ],
+  "require": {
+    "php": "^8.2",
+    "craftcms/cms": "^5.5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "moca\\capture\\": "src/"
+    }
+  },
+  "support": {
+    "source": "https://github.com/MOCA-nz/craft-capture",
+    "issues": "https://github.com/MOCA-nz/craft-capture/issues",
+    "docs": "https://github.com/MOCA-nz/craft-capture/blob/main/docs/README.md"
+  },
+  "extra": {
+    "name": "Capture",
+    "handle": "capture",
+    "developer": "MOCA",
+    "developerUrl": "https://www.moca.co.nz/",
+    "documentationUrl": "https://github.com/MOCA-nz/craft-capture/blob/main/docs/README.md",
+    "changelogUrl": "https://raw.githubusercontent.com/MOCA-nz/craft-capture/main/CHANGELOG.md",
+    "class": "moca\\capture\\Plugin"
+  }
+}

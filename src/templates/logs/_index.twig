@@ -1,0 +1,53 @@
+{% extends '_layouts/cp' %}
+
+{% set title = 'Logs'|t('capture') %}
+
+{% block actionButton %}
+  {% if rows is not empty %}
+    <form method="post" accept-charset="UTF-8">
+      {{ csrfInput() }}
+      {{ actionInput('capture/logs/clear') }}
+      <button type="submit" class="btn">{{ 'Clear log'|t('capture') }}</button>
+    </form>
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if rows is empty %}
+    <p class="light">{{ 'Nothing logged yet.'|t('capture') }}</p>
+  {% else %}
+    <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th scope="col">{{ 'When'|t('capture') }}</th>
+          <th scope="col">{{ 'Level'|t('capture') }}</th>
+          <th scope="col">{{ 'Event'|t('capture') }}</th>
+          <th scope="col">{{ 'Message'|t('capture') }}</th>
+          <th scope="col">{{ 'Form'|t('capture') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in rows %}
+          <tr>
+            <td data-title="{{ 'When'|t('capture') }}">{{ row.dateCreated|datetime('short') }}</td>
+            <td data-title="{{ 'Level'|t('capture') }}">
+              <span class="status {{ row.level == 'error' ? 'off' : (row.level == 'warning' ? 'pending' : 'live') }}"></span>
+              {{ row.level|title }}
+            </td>
+            <td data-title="{{ 'Event'|t('capture') }}"><code>{{ row.event }}</code></td>
+            <td data-title="{{ 'Message'|t('capture') }}">
+              {{ row.message }}
+              {%- if row.submissionId %}
+                <a href="{{ url('capture/submissions/' ~ row.submissionId) }}">{{ '(submission)'|t('capture') }}</a>
+              {% endif %}
+            </td>
+            <td data-title="{{ 'Form'|t('capture') }}">
+              {%- set form = forms[row.formId] ?? null -%}
+              {%- if form %}<a href="{{ url('capture/forms/' ~ form.id) }}">{{ form.name }}</a>{% else %}—{% endif -%}
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}

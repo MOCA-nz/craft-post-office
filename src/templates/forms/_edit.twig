@@ -1,0 +1,286 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% do view.registerAssetBundle('moca\\capture\\web\\assets\\formbuilder\\FormBuilderAsset') %}
+
+{% set fullPageForm = true %}
+{% set crumbs = [{ label: 'Forms'|t('capture'), url: url('capture/forms') }] %}
+
+{% set tabs = {
+  builder: { label: 'Builder'|t('capture'), url: '#builder' },
+  settings: { label: 'Settings'|t('capture'), url: '#settings' },
+} %}
+
+{% macro fieldSettings(key, field, fieldTypes) %}
+  {% import '_includes/forms' as forms %}
+  {% set name = 'fields[' ~ key ~ ']' %}
+
+  <div class="capture-field-settings hidden" data-capture-field-settings>
+    {{ forms.textField({
+      label: 'Label'|t('capture'),
+      instructions: 'What the visitor sees above the input.'|t('capture'),
+      name: name ~ '[label]',
+      value: field.label ?? '',
+      required: true,
+      inputAttributes: { 'data-capture-input': 'label' },
+    }) }}
+
+    {{ forms.textField({
+      label: 'Handle'|t('capture'),
+      instructions: 'How this field is referenced in templates and email.'|t('capture'),
+      name: name ~ '[handle]',
+      value: field.handle ?? '',
+      class: 'code',
+      required: true,
+      inputAttributes: { 'data-capture-input': 'handle' },
+    }) }}
+
+    {{ forms.selectField({
+      label: 'Type'|t('capture'),
+      name: name ~ '[type]',
+      options: fieldTypes,
+      value: field.type ?? 'text',
+      inputAttributes: { 'data-capture-input': 'type' },
+    }) }}
+
+    {{ forms.textField({
+      label: 'Placeholder'|t('capture'),
+      name: name ~ '[placeholder]',
+      value: field.placeholder ?? '',
+    }) }}
+
+    {{ forms.textareaField({
+      label: 'Options'|t('capture'),
+      instructions: 'One per line, for dropdown, radio and checkbox fields. Use `Label:value` to set a different stored value.'|t('capture'),
+      name: name ~ '[options]',
+      rows: 4,
+      value: field and field.options is not empty
+        ? field.options|map(o => o.label == o.value ? o.label : o.label ~ ':' ~ o.value)|join("\n")
+        : '',
+    }) }}
+
+    {{ forms.lightswitchField({
+      label: 'Required'|t('capture'),
+      name: name ~ '[required]',
+      on: field.required ?? false,
+    }) }}
+
+    {{ forms.textField({
+      label: 'Validation message'|t('capture'),
+      instructions: 'Shown when this field fails validation. Leave blank for the default.'|t('capture'),
+      name: name ~ '[errorMessage]',
+      value: field.errorMessage ?? '',
+    }) }}
+
+    {{ forms.lightswitchField({
+      label: 'Include in email'|t('capture'),
+      instructions: 'Whether this field appears in notification emails.'|t('capture'),
+      name: name ~ '[includeInEmail]',
+      on: field.includeInEmail ?? true,
+    }) }}
+  </div>
+{% endmacro %}
+
+{% import _self as builder %}
+
+{% block content %}
+  {{ actionInput('capture/forms/save') }}
+  {{ redirectInput('capture/forms/{id}') }}
+  {% if not isNew %}{{ hiddenInput('formId', form.id) }}{% endif %}
+
+  <div id="builder">
+    <div data-capture-builder>
+      {% if form.fields is empty %}
+        <div class="capture-empty" data-capture-empty>
+          {{ 'No fields yet. Add your first one below.'|t('capture') }}
+        </div>
+      {% endif %}
+
+      <ul class="capture-field-list" data-capture-field-list>
+        {% for field in form.fields %}
+          <li class="capture-field" data-capture-field>
+            <a class="move icon" title="{{ 'Reorder'|t('capture') }}"></a>
+            <button type="button" class="capture-field-summary" data-capture-field-open>
+              <span class="capture-field-label" data-capture-row-label>{{ field.label }}</span>
+              <span class="capture-field-meta" data-capture-row-meta>
+                {{ field.type }}{% if field.handle %} &middot; {{ field.handle }}{% endif %}
+              </span>
+            </button>
+            <span class="capture-field-required {{ not field.required ? 'hidden' }}" data-capture-row-required>*</span>
+            {{ builder.fieldSettings(field.uid, field, fieldTypes) }}
+          </li>
+        {% endfor %}
+      </ul>
+
+      <button type="button" class="btn add icon" data-capture-add-field>
+        {{ 'Add a field'|t('capture') }}
+      </button>
+
+      <script type="text/template" data-capture-field-prototype>
+        <li class="capture-field" data-capture-field>
+          <a class="move icon" title="{{ 'Reorder'|t('capture') }}"></a>
+          <button type="button" class="capture-field-summary" data-capture-field-open>
+            <span class="capture-field-label" data-capture-row-label>{{ 'Untitled field'|t('capture') }}</span>
+            <span class="capture-field-meta" data-capture-row-meta>{{ 'Text'|t('capture') }}</span>
+          </button>
+          <span class="capture-field-required hidden" data-capture-row-required>*</span>
+          {{ builder.fieldSettings('__ROW__', null, fieldTypes) }}
+        </li>
+      </script>
+    </div>
+  </div>
+
+  <div id="settings" class="hidden">
+    {{ forms.textField({
+      first: true,
+      label: 'Name'|t('capture'),
+      name: 'name',
+      value: form.name,
+      required: true,
+      errors: form.getErrors('name'),
+    }) }}
+
+    {{ forms.textField({
+      label: 'Handle'|t('capture'),
+      name: 'handle',
+      value: form.handle,
+      class: 'code',
+      required: true,
+      errors: form.getErrors('handle'),
+    }) }}
+
+    <hr>
+
+    {{ forms.textField({
+      label: 'From name'|t('capture'),
+      instructions: 'Leave blank to use the system default.'|t('capture'),
+      name: 'fromName',
+      value: form.fromName,
+      suggestEnvVars: true,
+    }) }}
+
+    {{ forms.autosuggestField({
+      label: 'From email'|t('capture'),
+      instructions: 'Leave blank to use the system default.'|t('capture'),
+      name: 'fromEmail',
+      value: form.fromEmail,
+      suggestEnvVars: true,
+      errors: form.getErrors('fromEmail'),
+    }) }}
+
+    {{ forms.autosuggestField({
+      label: 'Reply-To'|t('capture'),
+      instructions: 'Leave blank to reply to the submitter’s own email field.'|t('capture'),
+      name: 'replyToEmail',
+      value: form.replyToEmail,
+      suggestEnvVars: true,
+      errors: form.getErrors('replyToEmail'),
+    }) }}
+
+    <hr>
+
+    {{ forms.selectField({
+      label: 'On success'|t('capture'),
+      name: 'successBehavior',
+      options: [
+        { label: 'Redirect'|t('capture'), value: 'redirect' },
+        { label: 'No reload (JS fetch)'|t('capture'), value: 'ajax' },
+      ],
+      value: form.successBehavior,
+      toggle: true,
+      targetPrefix: 'success-',
+    }) }}
+
+    <div id="success-redirect" class="{{ form.successBehavior != 'redirect' ? 'hidden' }}">
+      {{ forms.textField({
+        label: 'Redirect URL'|t('capture'),
+        name: 'redirectUrl',
+        value: form.redirectUrl,
+        errors: form.getErrors('redirectUrl'),
+      }) }}
+    </div>
+
+    {{ forms.textareaField({
+      label: 'Success message'|t('capture'),
+      instructions: 'Shown after a successful submission, and returned in the JSON response.'|t('capture'),
+      name: 'formSuccessMessage',
+      value: form.successMessage,
+      rows: 2,
+    }) }}
+
+    <hr>
+
+    <h2>{{ 'Notifications'|t('capture') }}</h2>
+
+    {% set notificationRows = {} %}
+    {% for n in form.notifications|filter(n => not n.isAutoresponder) %}
+      {% set notificationRows = notificationRows|merge({
+        (n.uid): { recipientEmail: n.recipientEmail, templatePath: n.templatePath, enabled: n.enabled },
+      }) %}
+    {% endfor %}
+
+    {{ forms.editableTableField({
+      label: 'Send to'|t('capture'),
+      instructions: 'Each row is one email, with its own template.'|t('capture'),
+      name: 'notifications',
+      cols: {
+        recipientEmail: { type: 'singleline', heading: 'Recipient'|t('capture'), placeholder: 'name@example.com' },
+        templatePath: { type: 'singleline', heading: 'Email template'|t('capture'), code: true, placeholder: '_emails/enquiry' },
+        enabled: { type: 'lightswitch', heading: 'Enabled'|t('capture') },
+      },
+      rows: notificationRows,
+      addRowLabel: 'Add a recipient'|t('capture'),
+      allowAdd: true,
+      allowDelete: true,
+      allowReorder: true,
+    }) }}
+
+    {% set autoresponder = form.notifications|filter(n => n.isAutoresponder)|first %}
+
+    <h3>{{ 'Reply to the submitter'|t('capture') }}</h3>
+
+    {{ forms.lightswitchField({
+      label: 'Send a copy to the submitter'|t('capture'),
+      instructions: 'Sends to the form’s own email field. Always listed, never deleted.'|t('capture'),
+      name: 'autoresponderEnabled',
+      on: autoresponder ? autoresponder.enabled : false,
+    }) }}
+
+    {{ forms.textField({
+      label: 'Email template'|t('capture'),
+      name: 'autoresponderTemplate',
+      class: 'code',
+      placeholder: '_emails/confirmation',
+      value: autoresponder ? autoresponder.templatePath : '',
+    }) }}
+
+    <hr>
+
+    <h2>{{ 'Spam protection'|t('capture') }}</h2>
+
+    {{ forms.lightswitchField({
+      label: 'Honeypot'|t('capture'),
+      instructions: 'Adds a hidden field bots fill in, plus a minimum time-to-submit check.'|t('capture'),
+      name: 'honeypotEnabled',
+      on: form.honeypotEnabled,
+    }) }}
+
+    {{ forms.lightswitchField({
+      label: 'reCAPTCHA'|t('capture'),
+      instructions: 'Requires keys in the plugin settings.'|t('capture'),
+      name: 'recaptchaEnabled',
+      on: form.recaptchaEnabled,
+    }) }}
+
+    {{ forms.lightswitchField({
+      label: 'Turnstile'|t('capture'),
+      instructions: 'Requires keys in the plugin settings.'|t('capture'),
+      name: 'turnstileEnabled',
+      on: form.turnstileEnabled,
+    }) }}
+  </div>
+{% endblock %}
+
+{% js %}
+  new Craft.CaptureFormBuilder($('[data-capture-builder]'));
+{% endjs %}

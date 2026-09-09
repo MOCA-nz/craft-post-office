@@ -1,0 +1,71 @@
+{% extends '_layouts/cp' %}
+
+{% set title = submission.uiLabel %}
+{% set crumbs = [
+  { label: 'Submissions'|t('capture'), url: url('capture/submissions') },
+] %}
+
+{% block content %}
+  <table class="data fullwidth">
+    <tbody>
+      {% for row in submission.displayValues %}
+        <tr>
+          <th scope="row" style="width: 30%;">{{ row.label }}</th>
+          <td>{{ row.value is empty ? '—' : row.value|nl2br }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2 style="margin-top: 24px;">{{ 'Notifications sent'|t('capture') }}</h2>
+
+  {% if sent is empty %}
+    <p class="light">{{ 'No notifications were sent for this submission.'|t('capture') }}</p>
+  {% else %}
+    <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th scope="col">{{ 'Recipient'|t('capture') }}</th>
+          <th scope="col">{{ 'Status'|t('capture') }}</th>
+          <th scope="col">{{ 'Sent'|t('capture') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in sent %}
+          <tr>
+            <td>{{ row.recipientEmail }}</td>
+            <td>
+              <span class="status {{ row.status == 'sent' ? 'live' : 'off' }}"></span>
+              {{ row.status|title }}
+              {%- if row.error %} <span class="error">{{ row.error }}</span>{% endif %}
+            </td>
+            <td>{{ row.dateCreated|datetime('short') }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
+
+{% block details %}
+  <div class="meta read-only">
+    <div class="data">
+      <h5 class="heading">{{ 'Form'|t('capture') }}</h5>
+      <div class="value">
+        {%- if form -%}
+          <a href="{{ url('capture/forms/' ~ form.id) }}">{{ form.name }}</a>
+        {%- else -%}
+          {{ 'Deleted'|t('capture') }}
+        {%- endif -%}
+      </div>
+    </div>
+    <div class="data">
+      <h5 class="heading">{{ 'Date Submitted'|t('capture') }}</h5>
+      <div class="value">{{ submission.dateCreated|datetime('short') }}</div>
+    </div>
+    <div class="data">
+      <h5 class="heading">{{ 'IP address'|t('capture') }}</h5>
+      <div class="value">{{ submission.ipAddress ?: '—' }}</div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,84 @@
+{# One field. Override by copying to templates/capture/_field.twig in your project. #}
+{% set type = field.fieldType %}
+{% set name = 'fields[' ~ field.handle ~ ']' %}
+{% set id = 'capture-' ~ form.handle ~ '-' ~ field.handle %}
+{% set value = values[field.handle] ?? null %}
+{% set fieldErrors = errors[field.handle] ?? [] %}
+
+{% if type.value == 'hidden' %}
+  <input type="hidden" name="{{ name }}" value="{{ value }}">
+{% else %}
+  <div class="capture-field capture-field--{{ type.value }}{{ fieldErrors ? ' capture-field--error' }}">
+    {% if type.value != 'consent' %}
+      <label for="{{ id }}">
+        {{ field.label }}
+        {%- if field.required %} <span class="capture-required" aria-hidden="true">*</span>{% endif %}
+      </label>
+    {% endif %}
+
+    {% if type.isTextarea %}
+      <textarea
+        id="{{ id }}"
+        name="{{ name }}"
+        rows="5"
+        {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+        {% if field.required %}required aria-required="true"{% endif %}
+        {% if fieldErrors %}aria-invalid="true" aria-describedby="{{ id }}-error"{% endif %}
+      >{{ value }}</textarea>
+
+    {% elseif type.value == 'select' %}
+      <select id="{{ id }}" name="{{ name }}" {% if field.required %}required aria-required="true"{% endif %}>
+        <option value="">{{ field.placeholder ?: 'Choose…'|t('capture') }}</option>
+        {% for option in field.options %}
+          <option value="{{ option.value }}" {{ value == option.value ? 'selected' }}>{{ option.label }}</option>
+        {% endfor %}
+      </select>
+
+    {% elseif type.value == 'radio' %}
+      <div class="capture-options" role="radiogroup" aria-label="{{ field.label }}">
+        {% for option in field.options %}
+          <label>
+            <input type="radio" name="{{ name }}" value="{{ option.value }}" {{ value == option.value ? 'checked' }}>
+            {{ option.label }}
+          </label>
+        {% endfor %}
+      </div>
+
+    {% elseif type.value == 'checkboxes' %}
+      <div class="capture-options" role="group" aria-label="{{ field.label }}">
+        {% for option in field.options %}
+          <label>
+            <input type="checkbox" name="{{ name }}[]" value="{{ option.value }}"
+                   {{ option.value in (value ?? []) ? 'checked' }}>
+            {{ option.label }}
+          </label>
+        {% endfor %}
+      </div>
+
+    {% elseif type.value == 'consent' %}
+      <label class="capture-consent">
+        <input type="checkbox" name="{{ name }}" value="1" {{ value ? 'checked' }}
+               {% if field.required %}required aria-required="true"{% endif %}>
+        {{ field.label }}
+        {%- if field.required %} <span class="capture-required" aria-hidden="true">*</span>{% endif %}
+      </label>
+
+    {% else %}
+      <input
+        type="{{ type.inputType }}"
+        id="{{ id }}"
+        name="{{ name }}"
+        value="{{ value }}"
+        {% if field.placeholder %}placeholder="{{ field.placeholder }}"{% endif %}
+        {% if field.required %}required aria-required="true"{% endif %}
+        {% if fieldErrors %}aria-invalid="true" aria-describedby="{{ id }}-error"{% endif %}
+      >
+    {% endif %}
+
+    {% if fieldErrors %}
+      <p class="capture-error" id="{{ id }}-error" data-capture-error="{{ field.handle }}">{{ fieldErrors|first }}</p>
+    {% else %}
+      <p class="capture-error" id="{{ id }}-error" data-capture-error="{{ field.handle }}" hidden></p>
+    {% endif %}
+  </div>
+{% endif %}

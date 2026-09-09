@@ -1,0 +1,50 @@
+{% extends '_layouts/cp' %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Forms'|t('capture') %}
+
+{% block actionButton %}
+  <a href="{{ url('capture/forms/new') }}" class="btn submit add icon">{{ 'New form'|t('capture') }}</a>
+{% endblock %}
+
+{% block content %}
+  {% if forms is empty %}
+    <p>{{ 'No forms yet.'|t('capture') }}</p>
+  {% else %}
+    <table class="data fullwidth">
+      <thead>
+        <tr>
+          <th scope="col">{{ 'Name'|t('capture') }}</th>
+          <th scope="col">{{ 'Handle'|t('capture') }}</th>
+          <th scope="col">{{ 'Fields'|t('capture') }}</th>
+          <th scope="col">{{ 'Submissions'|t('capture') }}</th>
+          <td class="thin"></td>
+        </tr>
+      </thead>
+      <tbody>
+        {% for form in forms %}
+          <tr>
+            <th scope="row" data-title="{{ 'Name'|t('capture') }}">
+              <a href="{{ url('capture/forms/' ~ form.id) }}">{{ form.name }}</a>
+            </th>
+            <td data-title="{{ 'Handle'|t('capture') }}"><code>{{ form.handle }}</code></td>
+            <td data-title="{{ 'Fields'|t('capture') }}">{{ form.fields|length }}</td>
+            <td data-title="{{ 'Submissions'|t('capture') }}">
+              <a href="{{ url('capture/submissions', { source: 'form:' ~ form.handle }) }}">
+                {{ craft.capture.submissionCount(form.id) }}
+              </a>
+            </td>
+            <td class="thin">
+              <form method="post" accept-charset="UTF-8">
+                {{ csrfInput() }}
+                {{ actionInput('capture/forms/delete') }}
+                {{ hiddenInput('id', form.id) }}
+                <button type="submit" class="delete icon" title="{{ 'Delete'|t('capture') }}"></button>
+              </form>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% endif %}
+{% endblock %}
