@@ -124,7 +124,14 @@ class Notifications extends Component
     private function _resolveRecipient(Notification $notification, Submission $submission, Form $form): ?string
     {
         if (!$notification->getIsAutoresponder()) {
-            $address = App::parseEnv($notification->recipientEmail);
+            $configured = (string)$notification->recipientEmail;
+            $valueTemplate = Plugin::getInstance()->valueTemplate;
+
+            if ($valueTemplate->isTemplated($configured)) {
+                return $this->_resolveTemplatedRecipient($notification, $submission, $form);
+            }
+
+            $address = App::parseEnv($configured);
 
             return $address !== '' ? $address : null;
         }
@@ -141,17 +148,96 @@ class Notifications extends Component
     }
 
     /**
+     * Resolves a recipient that is driven by a form field.
+     *
+     * Only the field types in ValueTemplate::RECIPIENT_TYPES may decide this, and whatever
+     * they resolve to still has to look like an address. A failure here is recorded against
+     * the submission rather than thrown, because the enquiry is already saved and the person
+     * who needs to know is whoever is reading Sent Notifications.
+     */
+    private function _resolveTemplatedRecipient(Notification $notification, Submission $submission, Form $form): ?string
+    {
+        $template = (string)$notification->recipientEmail;
+        $errors = [];
+        $resolved = Plugin::getInstance()->valueTemplate->resolve(
+            $template,
+            $submission,
+            ValueTemplate::RECIPIENT_TYPES,
+            $errors,
+        );
+
+        $addresses = array_values(array_filter(array_map('trim', explode(',', $resolved))));
+
+        foreach ($addresses as $address) {
+            if (!filter_var($address, FILTER_VALIDATE_EMAIL)) {
+                $errors[] = "“{$address}” is not a valid email address.";
+            }
+        }
+
+        // Only worth saying when nothing above already explains why.
+        if ($addresses === [] && $errors === []) {
+            $errors[] = 'The recipient resolved to nothing.';
+        }
+
+        if ($errors !== []) {
+            $this->_record(
+                $notification,
+                $submission,
+                $template,
+                Craft::t('capture', 'Unresolved recipient'),
+                self::STATUS_FAILED,
+                implode(' ', $errors),
+            );
+
+            Plugin::getInstance()->log->write(
+                Log::LEVEL_ERROR,
+                'recipient.unresolved',
+                "A templated recipient could not be resolved: " . implode(' ', $errors),
+                $form->id,
+                $submission->id,
+                ['template' => $template],
+            );
+
+            return null;
+        }
+
+        return implode(',', $addresses);
+    }
+
+    /**
+     * Resolves a subject that may reference form fields.
+     *
+     * Any field may drive a subject: unlike a recipient, a subject cannot send mail
+     * somewhere unintended, so there is nothing to restrict.
+     */
+    private function _resolveSubject(Notification $notification, Submission $submission, Form $form): string
+    {
+        $subject = $notification->getSubject($form->name);
+        $valueTemplate = Plugin::getInstance()->valueTemplate;
+
+        if (!$valueTemplate->isTemplated($subject)) {
+            return $subject;
+        }
+
+        $errors = [];
+        $resolved = trim($valueTemplate->resolve($subject, $submission, null, $errors));
+
+        // A subject that resolved to nothing is worse than a generic one.
+        return $resolved !== '' ? $resolved : $notification->getDefaultSubject($form->name);
+    }
+
+    /**
      * Renders and sends one notification, recording the outcome either way.
      */
     private function _send(Notification $notification, Submission $submission, Form $form, string $recipient): void
     {
-        $subject = $notification->getSubject($form->name);
+        $subject = $this->_resolveSubject($notification, $submission, $form);
 
         try {
             $body = $this->render($notification, $submission, $form);
 
             $message = Craft::$app->getMailer()->compose()
-                ->setTo($recipient)
+                ->setTo(str_contains($recipient, ',') ? explode(',', $recipient) : $recipient)
                 ->setSubject($subject)
                 ->setHtmlBody($body);
 

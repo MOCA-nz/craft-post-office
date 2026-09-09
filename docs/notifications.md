@@ -16,6 +16,58 @@ Each form has its own list of outgoing emails, on the form's **Settings** tab.
 Add as many as you need. Three rows means three separate emails, each able to use a different
 template, which is how you send a different message to different people from one form.
 
+## Letting a form field decide the recipient
+
+Both the Recipient and the Subject accept `{{ fieldHandle }}`, resolved against each
+submission. The usual case is a "who do you want to talk to" dropdown that routes the enquiry
+to that person:
+
+Build a `select` field whose option **values are the addresses**:
+
+```
+Jane Smith:jane@moca.co.nz
+Bob Tane:bob@moca.co.nz
+```
+
+Then set the notification's Recipient to `{{ agent }}` and, if you like, its Subject to
+`Enquiry for you from {{ fullName }}`.
+
+`{{ values.agent }}` works too, since that is what people reach for.
+
+### Which fields may decide a recipient
+
+Only `select`, `radio`, `checkboxes` and `email`.
+
+The first three can only ever yield an address you put in the options yourself. Email fields
+are free text, but sending to an address the visitor supplied is already what the
+autoresponder does, so it is allowed for consistency.
+
+A free-text field is **not** allowed. If it were, a visitor could type any address into it
+and have your site send mail there, which is a spam relay wearing your domain. Referencing
+one is recorded as a failed send explaining why.
+
+A Subject may reference any field: a subject cannot send mail anywhere unintended.
+
+### It is not Twig
+
+Only `{{ fieldHandle }}` is understood. `{{ 7 * 7 }}` is left alone, not evaluated. The
+strings come from your settings but the values substituted into them come from whoever filled
+the form in, and handing that to a template engine is how server-side template injection
+happens.
+
+### When it cannot be resolved
+
+Nothing is sent, and a row is written to Sent Notifications with the reason: the field is
+missing, it was left empty, its type is not allowed, or the result is not a valid address.
+The submission itself is never affected.
+
+A Subject that resolves to nothing falls back to the default rather than sending a blank one.
+
+### Multiple recipients
+
+A `checkboxes` field resolves to every ticked value, so one notification can go to several
+people at once.
+
 ## The autoresponder
 
 Below the recipients is a single fixed row, **Send a copy to the submitter**. It has no

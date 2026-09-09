@@ -4,6 +4,7 @@ namespace moca\capture\models;
 
 use Craft;
 use craft\base\Model;
+use moca\capture\Plugin;
 
 /**
  * One outgoing email rule on a form.
@@ -44,6 +45,14 @@ class Notification extends Model
             return $this->subject;
         }
 
+        return $this->getDefaultSubject($formName);
+    }
+
+    /**
+     * The subject used when none is set, or when a templated one resolves to nothing.
+     */
+    public function getDefaultSubject(string $formName): string
+    {
         return $this->getIsAutoresponder()
             ? Craft::t('capture', 'Thanks for getting in touch')
             : Craft::t('capture', 'New {form} submission', ['form' => $formName]);
@@ -57,7 +66,13 @@ class Notification extends Model
         return array_merge(parent::defineRules(), [
             [['kind'], 'in', 'range' => [self::KIND_RECIPIENT, self::KIND_AUTORESPONDER]],
             [['templatePath', 'subject'], 'string', 'max' => 255],
-            [['recipientEmail'], 'email'],
+            [
+                ['recipientEmail'],
+                'email',
+                // A templated recipient resolves per submission, so it cannot be validated
+                // as an address here. The resolved value is checked at send time instead.
+                'when' => fn(self $model) => !Plugin::getInstance()->valueTemplate->isTemplated($model->recipientEmail),
+            ],
             [
                 ['recipientEmail'],
                 'required',

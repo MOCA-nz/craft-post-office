@@ -24,6 +24,7 @@ use moca\capture\services\Log;
 use moca\capture\services\Notifications;
 use moca\capture\services\Spam;
 use moca\capture\services\Submissions;
+use moca\capture\services\ValueTemplate;
 use moca\capture\variables\CaptureVariable;
 use yii\base\Event;
 
@@ -39,6 +40,7 @@ use yii\base\Event;
  * @property-read Notifications $notifications
  * @property-read Spam $spam
  * @property-read Log $log
+ * @property-read ValueTemplate $valueTemplate
  * @method Settings getSettings()
  */
 class Plugin extends BasePlugin
@@ -61,6 +63,7 @@ class Plugin extends BasePlugin
                 'notifications' => ['class' => Notifications::class],
                 'spam' => ['class' => Spam::class],
                 'log' => ['class' => Log::class],
+                'valueTemplate' => ['class' => ValueTemplate::class],
             ],
         ];
     }

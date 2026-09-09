@@ -348,6 +348,7 @@ class Submission extends Element
         // No column for the submission's own label: Craft always renders that as the first
         // column, so adding one here just repeats it.
         return [
+            'id' => ['label' => Craft::t('capture', 'ID')],
             'form' => ['label' => Craft::t('capture', 'Form')],
             'site' => ['label' => Craft::t('capture', 'Site')],
             'ipAddress' => ['label' => Craft::t('capture', 'IP address')],
@@ -370,6 +371,7 @@ class Submission extends Element
     {
         return [
             'dateCreated' => Craft::t('capture', 'Date submitted'),
+            'id' => Craft::t('capture', 'ID'),
         ];
     }
 

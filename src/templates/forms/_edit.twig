@@ -229,7 +229,7 @@
 
     {{ forms.editableTableField({
       label: 'Send to'|t('capture'),
-      instructions: 'Each row is one email, with its own template.'|t('capture'),
+      instructions: 'Each row is one email, with its own template. Recipient and Subject accept a field reference like `{{ agent }}`, resolved per submission. Only select, radio, checkboxes and email fields may decide a recipient.'|t('capture'),
       name: 'notifications',
       cols: {
         recipientEmail: { type: 'singleline', heading: 'Recipient'|t('capture'), placeholder: 'name@example.com' },
