@@ -107,6 +107,16 @@ matching on text.
 Note that a submission rejected as spam returns `success: true` with a null `submissionId`.
 See [spam protection](spam.md) for why.
 
+## Exporting
+
+The submissions index has an Export button. Capture adds its own **Submissions** exporter,
+which is the default and writes one column per form field, plus ID, form, date and IP. Craft's
+built-in "Raw data" exporter is still available but writes the values as a single cell of
+JSON, which is rarely what you want.
+
+Exporting across several forms at once produces the union of their fields, with blanks where
+a form has no such field.
+
 ## Other template variables
 
 ```twig

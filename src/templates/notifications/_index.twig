@@ -2,9 +2,15 @@
 
 {% set title = 'Sent Notifications'|t('capture') %}
 
+{% set baseUrl = 'capture/sent-notifications' %}
+
 {% block content %}
-  {% if rows is empty %}
+  {% if total == 0 %}
     <p class="light">{{ 'Nothing has been sent yet.'|t('capture') }}</p>
+  {% elseif rows is empty %}
+    <p class="light">{{ 'No results on this page.'|t('capture') }}</p>
+
+    {% include 'capture/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
   {% else %}
     <table class="data fullwidth">
       <thead>
@@ -40,5 +46,9 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% include 'capture/_pager' with {
+      page: page, totalPages: totalPages, total: total, baseUrl: baseUrl,
+    } only %}
   {% endif %}
 {% endblock %}

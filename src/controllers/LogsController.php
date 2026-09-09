@@ -30,17 +30,29 @@ class LogsController extends Controller
         return true;
     }
 
-    public function actionIndex(): Response
+    /**
+     * How many rows a page shows.
+     */
+    public const PAGE_SIZE = 100;
+
+    public function actionIndex(int $page = 1): Response
     {
+        $page = max(1, $page);
         $forms = [];
 
         foreach (Plugin::getInstance()->forms->getAllForms() as $form) {
             $forms[$form->id] = $form;
         }
 
+        $query = Plugin::getInstance()->log->getQuery();
+        $total = (int)$query->count();
+
         return $this->renderTemplate('capture/logs/_index', [
-            'rows' => Plugin::getInstance()->log->getQuery()->limit(500)->all(),
+            'rows' => $query->offset(($page - 1) * self::PAGE_SIZE)->limit(self::PAGE_SIZE)->all(),
             'forms' => $forms,
+            'page' => $page,
+            'total' => $total,
+            'totalPages' => max(1, (int)ceil($total / self::PAGE_SIZE)),
         ]);
     }
 

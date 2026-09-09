@@ -7,6 +7,7 @@ use craft\db\Query;
 use craft\helpers\App;
 use craft\helpers\Db;
 use craft\web\View;
+use DateTime;
 use moca\capture\elements\Submission;
 use moca\capture\migrations\Install;
 use moca\capture\models\Form;
@@ -76,6 +77,22 @@ class Notifications extends Component
     }
 
     /**
+     * Deletes sent-notification records older than the given number of days.
+     *
+     * @return int How many rows were removed.
+     */
+    public function pruneSent(int $days): int
+    {
+        if ($days <= 0) {
+            return 0;
+        }
+
+        return Db::delete(Install::TABLE_SENTNOTIFICATIONS, [
+            '<', 'dateCreated', Db::prepareDateForDb(new DateTime("-$days days")),
+        ]);
+    }
+
+    /**
      * Renders the body of one notification.
      *
      * A notification with no template of its own falls back to the plugin's default, which
@@ -128,7 +145,7 @@ class Notifications extends Component
      */
     private function _send(Notification $notification, Submission $submission, Form $form, string $recipient): void
     {
-        $subject = $this->_subject($notification, $form);
+        $subject = $notification->getSubject($form->name);
 
         try {
             $body = $this->render($notification, $submission, $form);
@@ -183,13 +200,6 @@ class Notifications extends Component
         $value = $submission->getValues()[$emailField->handle] ?? null;
 
         return is_string($value) && $value !== '' ? $value : null;
-    }
-
-    private function _subject(Notification $notification, Form $form): string
-    {
-        return $notification->getIsAutoresponder()
-            ? Craft::t('capture', 'Thanks for getting in touch')
-            : Craft::t('capture', 'New {form} submission', ['form' => $form->name]);
     }
 
     /**

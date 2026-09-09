@@ -9,6 +9,7 @@ Each form has its own list of outgoing emails, on the form's **Settings** tab.
 | Column | Meaning |
 |---|---|
 | Recipient | Where it goes. Accepts an environment variable reference |
+| Subject | The subject line. Leave blank for "New {form name} submission" |
 | Email template | The Twig template that renders the body. Leave blank for Capture's default |
 | Enabled | Whether this row sends |
 
@@ -65,15 +66,27 @@ submission date. To restyle the default for every form at once, copy the plugin'
 
 ## Subjects
 
-Recipient emails are subjected "New {form name} submission". The autoresponder uses "Thanks
-for getting in touch". To control the subject yourself, set it in your own template's
-context, or override the default template.
+Set per notification, in the Subject column. Leave it blank and recipients get
+"New {form name} submission", and the autoresponder gets "Thanks for getting in touch".
+
+## When they send
+
+Notifications are queued, not sent during the visitor's request, so a slow or unreachable
+mail host never delays a submission. They go out on the next queue run.
+
+The submission is saved before any email is attempted, so a mail failure costs an email and
+never the enquiry. If your queue is not running, submissions still arrive; the emails simply
+wait.
 
 ## What gets recorded
 
 Every attempt writes a row to **Sent Notifications**, whether it succeeded or not, with the
 date, time, recipient, status, and a link to the submission. A failure also records the
-reason, and writes an entry to the [log](../README.md).
+reason, and writes an entry to the log.
+
+Both that screen and the log are paginated, and both are pruned by Craft's garbage
+collection according to **Keep history for** on the plugin's settings screen (90 days by
+default, 0 to keep everything).
 
 A missing template is the most common failure, and it shows up as
 `Unable to find the template "…"`. The submission itself is never lost: it is saved before

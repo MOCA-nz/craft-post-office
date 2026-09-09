@@ -11,6 +11,7 @@ use craft\events\RegisterUrlRulesEvent;
 use craft\events\RegisterUserPermissionsEvent;
 use craft\helpers\UrlHelper;
 use craft\services\Elements;
+use craft\services\Gc;
 use craft\services\UserPermissions;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
@@ -42,7 +43,7 @@ use yii\base\Event;
  */
 class Plugin extends BasePlugin
 {
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.1.0';
 
     public bool $hasCpSettings = true;
 
@@ -76,6 +77,7 @@ class Plugin extends BasePlugin
         $this->_registerVariable();
         $this->_registerPermissions();
         $this->_registerSiteTemplateRoot();
+        $this->_registerGarbageCollection();
 
         Craft::$app->onInit(function() {
             $this->_registerProjectConfigHandlers();
@@ -182,6 +184,29 @@ class Plugin extends BasePlugin
         );
     }
 
+    /**
+     * Prunes the plugin's two history tables when Craft runs garbage collection.
+     *
+     * Both gain rows indefinitely otherwise: one per email sent and one per logged event.
+     */
+    private function _registerGarbageCollection(): void
+    {
+        Event::on(
+            Gc::class,
+            Gc::EVENT_RUN,
+            function() {
+                $days = $this->getSettings()->historyRetentionDays;
+
+                if ($days <= 0) {
+                    return;
+                }
+
+                $this->notifications->pruneSent($days);
+                $this->log->prune($days);
+            }
+        );
+    }
+
     private function _registerVariable(): void
     {
         Event::on(
@@ -214,6 +239,7 @@ class Plugin extends BasePlugin
                 $event->rules['capture/submissions/<submissionId:\d+>'] = 'capture/submissions/view';
                 $event->rules['capture/sent-notifications'] = 'capture/notifications/index';
                 $event->rules['capture/logs'] = 'capture/logs/index';
+                $event->rules['capture/logs/<page:\d+>'] = 'capture/logs/index';
                 $event->rules['capture/sent-notifications/<page:\d+>'] = 'capture/notifications/index';
                 $event->rules['capture/settings'] = 'capture/settings/index';
             }

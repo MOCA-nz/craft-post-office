@@ -41,7 +41,8 @@ The **Success message** is shown as the flash notice in redirect mode, and retur
 
 ## Notifications
 
-Covered in [notifications](notifications.md).
+A repeatable list of recipients, each with its own subject and email template, plus the
+autoresponder. Covered in [notifications](notifications.md).
 
 ## Spam protection
 

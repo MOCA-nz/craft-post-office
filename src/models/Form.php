@@ -2,6 +2,7 @@
 
 namespace moca\capture\models;
 
+use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\validators\HandleValidator;
@@ -122,6 +123,45 @@ class Form extends Model
                 'required',
                 'when' => fn(self $model) => $model->successBehavior === self::SUCCESS_REDIRECT,
             ],
+            [['fields'], 'validateFields'],
         ]);
+    }
+
+    /**
+     * Validates the form's fields as a set.
+     *
+     * Uniqueness cannot be checked one field at a time: when a form is saved, the clashing
+     * sibling is not in the database yet, so a per-record validator sees nothing wrong and
+     * the save reaches the (formId, handle) unique index and dies with an integrity error
+     * instead of a message an editor can act on.
+     */
+    public function validateFields(): void
+    {
+        $seen = [];
+
+        foreach ($this->_fields as $i => $field) {
+            $position = $i + 1;
+
+            if (!$field->validate()) {
+                foreach ($field->getFirstErrors() as $message) {
+                    $this->addError('fields', Craft::t('capture', 'Field {position}: {message}', [
+                        'position' => $position,
+                        'message' => $message,
+                    ]));
+                }
+
+                continue;
+            }
+
+            if (isset($seen[$field->handle])) {
+                $this->addError('fields', Craft::t('capture', 'More than one field uses the handle “{handle}”. Handles must be unique within a form.', [
+                    'handle' => $field->handle,
+                ]));
+
+                continue;
+            }
+
+            $seen[$field->handle] = true;
+        }
     }
 }

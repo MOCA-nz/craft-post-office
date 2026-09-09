@@ -78,7 +78,31 @@
       this.modal.show();
       this.modal.updateSizeAndPosition();
 
+      this.initHandleGenerator($settings);
+
       Garnish.setFocusWithin(this.$modalBody);
+    },
+
+    /**
+     * Derives the handle from the label as it is typed, the way every other Craft screen does.
+     *
+     * Craft's generator stops as soon as the handle is edited by hand, and never touches a
+     * handle that already has a value, so an existing field's handle is safe: changing its
+     * label will not silently rename it and orphan the stored values.
+     */
+    initHandleGenerator: function ($settings) {
+      if ($settings.data('handleGenerator')) {
+        return;
+      }
+
+      var $label = $settings.find('[data-capture-input="label"]');
+      var $handle = $settings.find('[data-capture-input="handle"]');
+
+      if (!$label.length || !$handle.length) {
+        return;
+      }
+
+      $settings.data('handleGenerator', new Craft.HandleGenerator($label, $handle));
     },
 
     buildModal: function () {

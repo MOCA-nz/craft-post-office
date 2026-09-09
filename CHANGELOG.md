@@ -20,3 +20,9 @@
   switched on or off per form.
 - Front-end rendering through `craft.capture.form('handle')`, with fully overridable
   templates, plus a JSON endpoint for hand-written markup.
+- Notification subjects set per notification, falling back to a sensible default.
+- Notifications are queued rather than sent during the visitor's request.
+- A submissions exporter writing one column per form field.
+- Field handles generated from the label as you type.
+- Paginated Sent Notifications and Logs screens, both pruned by Craft's garbage collection
+  according to a configurable retention window.

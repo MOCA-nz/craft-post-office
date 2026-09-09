@@ -112,6 +112,7 @@ class Install extends Migration
             // form resolves its address at send time from the submission's email field.
             'kind' => $this->string(20)->notNull()->defaultValue('recipient'),
             'recipientEmail' => $this->string(),
+            'subject' => $this->string(),
             'templatePath' => $this->string(),
             'enabled' => $this->boolean()->notNull()->defaultValue(true),
             'sortOrder' => $this->smallInteger()->unsigned(),

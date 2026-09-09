@@ -16,7 +16,12 @@ handle to reorder, and use Delete inside the editor to remove it.
 | Validation message | Shown when the field fails. Leave blank for the default |
 | Include in email | Whether the field appears in notification emails |
 
-The handle is generated from the label but stays editable. It must be unique within the form.
+The handle is generated from the label as you type and stays editable. Once you edit it by
+hand, or once a field has been saved, it is left alone: changing a label never silently
+renames a handle and orphans the values already stored under it.
+
+Handles must be unique within a form. A duplicate is rejected on save with an error naming
+the handle.
 
 ## The types
 

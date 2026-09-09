@@ -12,8 +12,10 @@ use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use moca\capture\controllers\SubmissionsController;
 use moca\capture\elements\db\SubmissionQuery;
+use moca\capture\elements\exporters\SubmissionExport;
 use moca\capture\models\Form;
 use moca\capture\Plugin;
+use moca\capture\queue\jobs\SendNotifications;
 use yii\base\DynamicModel;
 
 /**
@@ -290,6 +292,20 @@ class Submission extends Element
 
     /**
      * @inheritdoc
+     *
+     * The plugin's own exporter goes first so it is the default choice: Craft's raw exporter
+     * writes the values column as a single cell of JSON, which is no use in a spreadsheet.
+     */
+    protected static function defineExporters(string $source): array
+    {
+        $exporters = parent::defineExporters($source);
+        array_unshift($exporters, SubmissionExport::class);
+
+        return $exporters;
+    }
+
+    /**
+     * @inheritdoc
      */
     protected static function defineTableAttributes(): array
     {
@@ -456,10 +472,15 @@ class Submission extends Element
         if (!$this->propagating) {
             Plugin::getInstance()->submissions->saveSubmissionRecord($this, $isNew);
 
-            // Notifications fire on insert only: re-saving a submission from the CP must
-            // never re-send the emails.
+            // Notifications fire on insert only: re-saving a submission, or restoring one
+            // from the trash, must never re-send the emails.
+            //
+            // Queued rather than sent here, so the visitor's request does not wait on the
+            // mail host. The submission is committed either way.
             if ($isNew) {
-                Plugin::getInstance()->notifications->sendForSubmission($this);
+                Craft::$app->getQueue()->push(new SendNotifications([
+                    'submissionId' => $this->id,
+                ]));
             }
         }
 

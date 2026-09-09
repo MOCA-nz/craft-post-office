@@ -37,6 +37,15 @@ class Settings extends Model
     public string $turnstileSecretKey = '';
 
     /**
+     * @var int How many days of sent-notification and log history to keep.
+     *
+     * Both tables gain a row per email and per event, so on a busy form they grow without
+     * limit. Craft's garbage collection prunes anything older than this. Zero keeps
+     * everything, which is a deliberate choice rather than a default.
+     */
+    public int $historyRetentionDays = 90;
+
+    /**
      * @inheritdoc
      */
     protected function defineRules(): array
@@ -51,6 +60,7 @@ class Settings extends Model
                 ],
                 'string',
             ],
+            [['historyRetentionDays'], 'integer', 'min' => 0],
         ]);
     }
 }

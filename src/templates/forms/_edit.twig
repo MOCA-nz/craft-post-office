@@ -89,6 +89,14 @@
   {% if not isNew %}{{ hiddenInput('formId', form.id) }}{% endif %}
 
   <div id="builder">
+    {% if form.getErrors('fields') %}
+      <ul class="errors">
+        {% for error in form.getErrors('fields') %}
+          <li>{{ error }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+
     <div data-capture-builder>
       {% if form.fields is empty %}
         <div class="capture-empty" data-capture-empty>
@@ -215,7 +223,7 @@
     {% set notificationRows = {} %}
     {% for n in form.notifications|filter(n => not n.isAutoresponder) %}
       {% set notificationRows = notificationRows|merge({
-        (n.uid): { recipientEmail: n.recipientEmail, templatePath: n.templatePath, enabled: n.enabled },
+        (n.uid): { recipientEmail: n.recipientEmail, subject: n.subject, templatePath: n.templatePath, enabled: n.enabled },
       }) %}
     {% endfor %}
 
@@ -225,6 +233,7 @@
       name: 'notifications',
       cols: {
         recipientEmail: { type: 'singleline', heading: 'Recipient'|t('capture'), placeholder: 'name@example.com' },
+        subject: { type: 'singleline', heading: 'Subject'|t('capture'), placeholder: 'New enquiry' },
         templatePath: { type: 'singleline', heading: 'Email template'|t('capture'), code: true, placeholder: '_emails/enquiry' },
         enabled: { type: 'lightswitch', heading: 'Enabled'|t('capture') },
       },
@@ -244,6 +253,13 @@
       instructions: 'Sends to the form’s own email field. Always listed, never deleted.'|t('capture'),
       name: 'autoresponderEnabled',
       on: autoresponder ? autoresponder.enabled : false,
+    }) }}
+
+    {{ forms.textField({
+      label: 'Subject'|t('capture'),
+      instructions: 'Leave blank for “Thanks for getting in touch”.'|t('capture'),
+      name: 'autoresponderSubject',
+      value: autoresponder ? autoresponder.subject : '',
     }) }}
 
     {{ forms.textField({

@@ -1,0 +1,20 @@
+{# Shared pager for the plain-table screens. #}
+{% if totalPages > 1 %}
+  <nav class="pagination flex flex-justify" style="margin-top:14px" aria-label="{{ 'Pagination'|t('capture') }}">
+    <div class="flex">
+      {% if page > 1 %}
+        <a class="btn" href="{{ url(baseUrl, { page: page - 1 }) }}">{{ '← Previous'|t('capture') }}</a>
+      {% endif %}
+      {% if page < totalPages %}
+        <a class="btn" href="{{ url(baseUrl, { page: page + 1 }) }}">{{ 'Next →'|t('capture') }}</a>
+      {% endif %}
+    </div>
+    <div class="light">
+      {{ 'Page {page} of {totalPages}, {total} total'|t('capture', {
+        page: page, totalPages: totalPages, total: total,
+      }) }}
+    </div>
+  </nav>
+{% elseif total %}
+  <p class="light" style="margin-top:14px">{{ '{total} total'|t('capture', { total: total }) }}</p>
+{% endif %}

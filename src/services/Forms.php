@@ -200,7 +200,7 @@ class Forms extends Component
     public function getNotificationsByFormId(int $formId): array
     {
         $rows = (new Query())
-            ->select(['id', 'formId', 'kind', 'recipientEmail', 'templatePath', 'enabled', 'sortOrder', 'uid'])
+            ->select(['id', 'formId', 'kind', 'recipientEmail', 'subject', 'templatePath', 'enabled', 'sortOrder', 'uid'])
             ->from([Install::TABLE_NOTIFICATIONS])
             ->where(['formId' => $formId])
             // The autoresponder sorts last so the builder can render it as a fixed row
@@ -309,6 +309,7 @@ class Forms extends Component
             $config['notifications'][$notification->uid ?? StringHelper::UUID()] = [
                 'kind' => $notification->kind,
                 'recipientEmail' => $notification->recipientEmail,
+                'subject' => $notification->subject,
                 'templatePath' => $notification->templatePath,
                 'enabled' => $notification->enabled,
                 'sortOrder' => $i + 1,
@@ -386,6 +387,7 @@ class Forms extends Component
             $record->formId = $formId;
             $record->kind = $data['kind'] ?? Notification::KIND_RECIPIENT;
             $record->recipientEmail = $data['recipientEmail'] ?? null;
+            $record->subject = $data['subject'] ?? null;
             $record->templatePath = $data['templatePath'] ?? null;
             $record->enabled = (bool)($data['enabled'] ?? true);
             $record->sortOrder = $data['sortOrder'] ?? null;

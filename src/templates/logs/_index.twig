@@ -12,9 +12,15 @@
   {% endif %}
 {% endblock %}
 
+{% set baseUrl = 'capture/logs' %}
+
 {% block content %}
-  {% if rows is empty %}
+  {% if total == 0 %}
     <p class="light">{{ 'Nothing logged yet.'|t('capture') }}</p>
+  {% elseif rows is empty %}
+    <p class="light">{{ 'No results on this page.'|t('capture') }}</p>
+
+    {% include 'capture/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
   {% else %}
     <table class="data fullwidth">
       <thead>
@@ -49,5 +55,9 @@
         {% endfor %}
       </tbody>
     </table>
+
+    {% include 'capture/_pager' with {
+      page: page, totalPages: totalPages, total: total, baseUrl: baseUrl,
+    } only %}
   {% endif %}
 {% endblock %}

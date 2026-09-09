@@ -12,6 +12,22 @@
     {{ 'Keys are stored in project config, so give each one an environment variable reference rather than the key itself. Which of these run is set per form, on the form’s Settings tab.'|t('capture') }}
   </p>
 
+  <h2>{{ 'History'|t('capture') }}</h2>
+
+  {{ forms.textField({
+    label: 'Keep history for'|t('capture'),
+    instructions: 'How many days of sent notifications and log entries to keep. Craft’s garbage collection removes anything older. Set to 0 to keep everything forever.'|t('capture'),
+    name: 'historyRetentionDays',
+    value: settings.historyRetentionDays,
+    type: 'number',
+    size: 5,
+    unit: 'days'|t('capture'),
+    disabled: readOnly,
+    errors: settings.getErrors('historyRetentionDays'),
+  }) }}
+
+  <hr>
+
   <h2>{{ 'reCAPTCHA'|t('capture') }}</h2>
 
   {{ forms.autosuggestField({

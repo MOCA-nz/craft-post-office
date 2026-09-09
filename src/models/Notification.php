@@ -2,6 +2,7 @@
 
 namespace moca\capture\models;
 
+use Craft;
 use craft\base\Model;
 
 /**
@@ -20,6 +21,7 @@ class Notification extends Model
     public ?int $formId = null;
     public string $kind = self::KIND_RECIPIENT;
     public ?string $recipientEmail = null;
+    public ?string $subject = null;
     public ?string $templatePath = null;
     public bool $enabled = true;
     public ?int $sortOrder = null;
@@ -31,13 +33,30 @@ class Notification extends Model
     }
 
     /**
+     * The subject line for this notification.
+     *
+     * Falls back to a sensible default rather than requiring one, so an existing form keeps
+     * working and a new one does not need the field filled in to send.
+     */
+    public function getSubject(string $formName): string
+    {
+        if ($this->subject) {
+            return $this->subject;
+        }
+
+        return $this->getIsAutoresponder()
+            ? Craft::t('capture', 'Thanks for getting in touch')
+            : Craft::t('capture', 'New {form} submission', ['form' => $formName]);
+    }
+
+    /**
      * @inheritdoc
      */
     protected function defineRules(): array
     {
         return array_merge(parent::defineRules(), [
             [['kind'], 'in', 'range' => [self::KIND_RECIPIENT, self::KIND_AUTORESPONDER]],
-            [['templatePath'], 'string', 'max' => 255],
+            [['templatePath', 'subject'], 'string', 'max' => 255],
             [['recipientEmail'], 'email'],
             [
                 ['recipientEmail'],

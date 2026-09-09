@@ -211,6 +211,7 @@ class FormsController extends Controller
                 'uid' => $this->_uidOrNull($uid),
                 'kind' => Notification::KIND_RECIPIENT,
                 'recipientEmail' => $row['recipientEmail'],
+                'subject' => ($row['subject'] ?? '') ?: null,
                 'templatePath' => ($row['templatePath'] ?? '') ?: null,
                 'enabled' => !empty($row['enabled']),
             ]);
@@ -230,6 +231,7 @@ class FormsController extends Controller
             'uid' => $existing?->uid,
             'kind' => Notification::KIND_AUTORESPONDER,
             'recipientEmail' => null,
+            'subject' => $this->request->getBodyParam('autoresponderSubject') ?: null,
             'templatePath' => $this->request->getBodyParam('autoresponderTemplate') ?: null,
             'enabled' => (bool)$this->request->getBodyParam('autoresponderEnabled'),
         ]);

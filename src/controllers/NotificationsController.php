@@ -30,11 +30,26 @@ class NotificationsController extends Controller
     }
 
     /**
+     * How many rows a page shows.
+     */
+    public const PAGE_SIZE = 100;
+
+    /**
      * Lists sent notifications.
      */
-    public function actionIndex(): Response
+    public function actionIndex(int $page = 1): Response
     {
-        $rows = Plugin::getInstance()->notifications->getSentQuery()->limit(200)->all();
+        $page = max(1, $page);
+        $query = Plugin::getInstance()->notifications->getSentQuery();
+
+        // Counted before paging, so the screen can say how many there are rather than
+        // silently showing the first N and stopping.
+        $total = (int)$query->count();
+
+        $rows = $query
+            ->offset(($page - 1) * self::PAGE_SIZE)
+            ->limit(self::PAGE_SIZE)
+            ->all();
 
         // One query for every submission referenced, rather than one per row.
         $submissionIds = array_unique(array_column($rows, 'submissionId'));
@@ -45,6 +60,9 @@ class NotificationsController extends Controller
         return $this->renderTemplate('capture/notifications/_index', [
             'rows' => $rows,
             'submissions' => $submissions,
+            'page' => $page,
+            'total' => $total,
+            'totalPages' => max(1, (int)ceil($total / self::PAGE_SIZE)),
         ]);
     }
 }

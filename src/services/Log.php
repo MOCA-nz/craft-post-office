@@ -4,6 +4,7 @@ namespace moca\capture\services;
 
 use craft\db\Query;
 use craft\helpers\Db;
+use DateTime;
 use moca\capture\migrations\Install;
 use yii\base\Component;
 
@@ -50,6 +51,22 @@ class Log extends Component
         return (new Query())
             ->from([Install::TABLE_LOGS])
             ->orderBy(['dateCreated' => SORT_DESC]);
+    }
+
+    /**
+     * Deletes entries older than the given number of days.
+     *
+     * @return int How many rows were removed.
+     */
+    public function prune(int $days): int
+    {
+        if ($days <= 0) {
+            return 0;
+        }
+
+        return Db::delete(Install::TABLE_LOGS, [
+            '<', 'dateCreated', Db::prepareDateForDb(new DateTime("-$days days")),
+        ]);
     }
 
     /**

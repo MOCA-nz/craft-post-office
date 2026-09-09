@@ -57,6 +57,7 @@ class SettingsController extends Controller
         $settings->recaptchaSecretKey = (string)$this->request->getBodyParam('recaptchaSecretKey', '');
         $settings->turnstileSiteKey = (string)$this->request->getBodyParam('turnstileSiteKey', '');
         $settings->turnstileSecretKey = (string)$this->request->getBodyParam('turnstileSecretKey', '');
+        $settings->historyRetentionDays = (int)$this->request->getBodyParam('historyRetentionDays', 90);
 
         if (!Craft::$app->getPlugins()->savePluginSettings($plugin, $settings->toArray())) {
             $this->setFailFlash(Craft::t('capture', 'Couldn’t save settings.'));
