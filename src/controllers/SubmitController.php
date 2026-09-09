@@ -60,6 +60,9 @@ class SubmitController extends Controller
 
         $submission = new Submission();
         $submission->formId = $form->id;
+        // The site the visitor was actually on. Without this every submission lands on the
+        // primary site, and a multi-site install cannot tell them apart.
+        $submission->siteId = Craft::$app->getSites()->getCurrentSite()->id;
         $submission->ipAddress = $this->request->getUserIP();
         $submission->userAgent = $this->request->getUserAgent();
         $submission->setValues($this->_valuesFromPost($form));

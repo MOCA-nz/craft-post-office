@@ -7,6 +7,9 @@ A form's **Settings** tab.
 The handle is what you pass to `craft.capture.form()` and what identifies the form in posted
 markup. Changing it will break any template referencing the old one.
 
+Handles follow Craft's own rule: start with a letter, then letters, numbers and underscores
+only. `contactUs` is valid, `contact-us` is not. The same applies to field handles.
+
 ## Email addresses
 
 | Setting | Default when blank |

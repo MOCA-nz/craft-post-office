@@ -123,8 +123,22 @@ class Form extends Model
                 'required',
                 'when' => fn(self $model) => $model->successBehavior === self::SUCCESS_REDIRECT,
             ],
-            [['fields'], 'validateFields'],
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Field validation runs here rather than as a rule on `fields`. That property is backed
+     * by a getter and setter, so it is not one of the model's attributes, and a rule naming
+     * it is only run for some validation scenarios. Silently skipping it would put the
+     * duplicate-handle check back on the database's unique index, which fails as a 500.
+     */
+    public function afterValidate(): void
+    {
+        $this->validateFields();
+
+        parent::afterValidate();
     }
 
     /**

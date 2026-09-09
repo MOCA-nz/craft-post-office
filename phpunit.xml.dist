@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         bootstrap="tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="Capture">
+            <directory>tests</directory>
+        </testsuite>
+    </testsuites>
+    <source>
+        <include>
+            <directory>src</directory>
+        </include>
+    </source>
+    <php>
+        <!-- Forced: the two things local development gets wrong. -->
+        <env name="CRAFT_DB_DATABASE" value="db_test"/>
+        <env name="CRAFT_DB_TABLE_PREFIX" value=""/>
+
+        <!-- Not forced. Without force="true" PHPUnit only applies these when the variable
+             is not already set, so a DDEV shell and a CI runner each keep their own
+             coordinates. Forcing a hostname here is exactly what breaks CI. -->
+        <env name="CRAFT_DB_DRIVER" value="mysql"/>
+        <env name="CRAFT_DB_SERVER" value="db"/>
+        <env name="CRAFT_DB_PORT" value="3306"/>
+        <env name="CRAFT_DB_USER" value="db"/>
+        <env name="CRAFT_DB_PASSWORD" value="db"/>
+
+        <env name="QUEUE_DRIVER" value="sync"/>
+        <env name="CRAFT_INSTALL_EMAIL" value="test@example.test"/>
+        <env name="CRAFT_INSTALL_PASSWORD" value="secret"/>
+        <env name="CRAFT_INSTALL_SITEURL" value="http://localhost:8080"/>
+    </php>
+</phpunit>

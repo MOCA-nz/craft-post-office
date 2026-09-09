@@ -53,6 +53,7 @@ php craft plugin/install capture
 | Guide | Covers |
 |---|---|
 | [Field types](docs/field-types.md) | Every field type, its settings and its validation |
+| [Submissions](docs/submissions.md) | The index, the detail screen, export, trash, permissions, querying |
 | [Form settings](docs/form-settings.md) | From and reply-to, success behaviour, redirect vs no-reload |
 | [Notifications](docs/notifications.md) | Recipients, the autoresponder, email templates and their variables |
 | [Spam protection](docs/spam.md) | Honeypot, timing, reCAPTCHA and Turnstile |

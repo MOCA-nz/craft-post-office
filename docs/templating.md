@@ -122,15 +122,24 @@ a form has no such field.
 ```twig
 {{ craft.capture.getForm('contact') }}      {# one Form, or null #}
 {{ craft.capture.getForms() }}              {# every Form #}
-{{ craft.capture.submissionCount(formId) }} {# how many submissions a form has #}
+{{ craft.capture.submissionCount(formId) }} {# across all sites #}
+{{ craft.capture.submissionCount(formId, siteId) }} {# one site #}
+{{ craft.capture.submissions() }}           {# a submission query #}
 ```
 
-Submissions are elements, so they can be queried like any other:
+`craft.capture.submissions()` returns an element query, so it takes the usual parameters and
+chains like any other:
 
 ```twig
-{% set recent = craft.capture.getForm('contact') %}
-{% for submission in craft.query('moca\\capture\\elements\\Submission')
-    .formId(recent.id).limit(5).all() %}
-  {{ submission.values.fullName }}
+{% set form = craft.capture.getForm('contact') %}
+
+{% for submission in craft.capture.submissions({ formId: form.id, limit: 5 }).all() %}
+  {{ submission.values.fullName }} - {{ submission.dateCreated|datetime('short') }}
 {% endfor %}
 ```
+
+Note that Craft's own `craft.query()` will not work here: it is a generic database query
+builder that takes no element type.
+
+Submissions are elements, so everything else on them behaves normally: `dateCreated`,
+`id`, `getForm()`, and `values` keyed by field handle. See [submissions](submissions.md).

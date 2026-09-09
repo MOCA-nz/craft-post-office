@@ -103,6 +103,28 @@ class Submission extends Element
     /**
      * @inheritdoc
      *
+     * A submission exists on exactly the site it was submitted from. It is not content that
+     * gets translated or propagated: it is a record of one event on one site, so copying it
+     * to other sites would invent submissions nobody made.
+     */
+    public static function isLocalized(): bool
+    {
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Only the submission's own site, for the same reason.
+     */
+    public function getSupportedSites(): array
+    {
+        return [$this->siteId ?? Craft::$app->getSites()->getPrimarySite()->id];
+    }
+
+    /**
+     * @inheritdoc
+     *
      * @return SubmissionQuery
      */
     public static function find(): ElementQueryInterface
@@ -158,8 +180,22 @@ class Submission extends Element
     {
         return array_merge(parent::defineRules(), [
             [['formId'], 'required'],
-            [['values'], 'validateValues'],
         ]);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Field validation runs here rather than as a rule on `values`. `values` is backed by a
+     * getter and setter, so it is not one of the element's attributes, and a rule naming it
+     * is skipped depending on the validation scenario: it fired on saveElement() but not on
+     * a bare validate(). afterValidate() runs on every path.
+     */
+    public function afterValidate(): void
+    {
+        $this->validateValues();
+
+        parent::afterValidate();
     }
 
     /**
@@ -313,6 +349,7 @@ class Submission extends Element
         // column, so adding one here just repeats it.
         return [
             'form' => ['label' => Craft::t('capture', 'Form')],
+            'site' => ['label' => Craft::t('capture', 'Site')],
             'ipAddress' => ['label' => Craft::t('capture', 'IP address')],
             'dateCreated' => ['label' => Craft::t('capture', 'Date')],
         ];
@@ -351,6 +388,7 @@ class Submission extends Element
     {
         return match ($attribute) {
             'form' => Html::encode($this->getForm()->name ?? ''),
+            'site' => Html::encode($this->getSite()->name),
             'ipAddress' => Html::encode($this->ipAddress ?? ''),
             default => parent::attributeHtml($attribute),
         };

@@ -121,6 +121,11 @@ class Forms extends Component
             ->column();
 
         if ($submissionIds !== []) {
+            // relations and elements_sites carry foreign keys to elements and clean
+            // themselves up. searchindex and searchindexqueue do not, so deleting the
+            // elements rows alone leaves index rows pointing at nothing.
+            Db::delete(Table::SEARCHINDEX, ['elementId' => $submissionIds]);
+            Db::deleteIfExists(Table::SEARCHINDEXQUEUE, ['elementId' => $submissionIds]);
             Db::delete(Table::ELEMENTS, ['id' => $submissionIds]);
         }
 

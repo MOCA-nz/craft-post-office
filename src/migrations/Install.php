@@ -5,6 +5,7 @@ namespace moca\capture\migrations;
 use craft\db\Migration;
 use craft\db\Query;
 use craft\db\Table;
+use craft\helpers\Db;
 
 /**
  * Creates every table the plugin owns.
@@ -26,6 +27,9 @@ class Install extends Migration
      */
     public function safeUp(): bool
     {
+        // Idempotent throughout. An install that fails part-way leaves tables behind, and
+        // without these guards the retry dies on "table already exists" rather than
+        // finishing the job. Re-running indexes unguarded also walks MySQL's 64-key ceiling.
         $this->createTables();
         $this->createIndexes();
         $this->addForeignKeys();
@@ -48,6 +52,8 @@ class Install extends Migration
                 ->column($this->db);
 
             if ($submissionIds !== []) {
+                // searchindex has no foreign key to elements, so it needs deleting by hand.
+                $this->delete(Table::SEARCHINDEX, ['elementId' => $submissionIds]);
                 $this->delete(Table::ELEMENTS, ['id' => $submissionIds]);
             }
         }
@@ -68,7 +74,7 @@ class Install extends Migration
      */
     protected function createTables(): void
     {
-        $this->createTable(self::TABLE_FORMS, [
+        $this->createTableIfMissing(self::TABLE_FORMS, [
             'id' => $this->primaryKey(),
             'name' => $this->string()->notNull(),
             'handle' => $this->string()->notNull(),
@@ -87,7 +93,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->createTable(self::TABLE_FORMFIELDS, [
+        $this->createTableIfMissing(self::TABLE_FORMFIELDS, [
             'id' => $this->primaryKey(),
             'formId' => $this->integer()->notNull(),
             'type' => $this->string(40)->notNull(),
@@ -105,7 +111,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->createTable(self::TABLE_NOTIFICATIONS, [
+        $this->createTableIfMissing(self::TABLE_NOTIFICATIONS, [
             'id' => $this->primaryKey(),
             'formId' => $this->integer()->notNull(),
             // 'recipient' rows carry a fixed address. The single 'autoresponder' row per
@@ -121,7 +127,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->createTable(self::TABLE_SUBMISSIONS, [
+        $this->createTableIfMissing(self::TABLE_SUBMISSIONS, [
             'id' => $this->integer()->notNull(),
             'formId' => $this->integer()->notNull(),
             // Submitted values, keyed by field handle.
@@ -134,7 +140,7 @@ class Install extends Migration
             'PRIMARY KEY([[id]])',
         ]);
 
-        $this->createTable(self::TABLE_SENTNOTIFICATIONS, [
+        $this->createTableIfMissing(self::TABLE_SENTNOTIFICATIONS, [
             'id' => $this->primaryKey(),
             'submissionId' => $this->integer()->notNull(),
             'notificationId' => $this->integer(),
@@ -147,7 +153,7 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
-        $this->createTable(self::TABLE_LOGS, [
+        $this->createTableIfMissing(self::TABLE_LOGS, [
             'id' => $this->primaryKey(),
             'formId' => $this->integer(),
             'submissionId' => $this->integer(),
@@ -162,25 +168,54 @@ class Install extends Migration
     }
 
     /**
+     * Creates a table only when it is not already there.
+     */
+    protected function createTableIfMissing(string $table, array $columns): void
+    {
+        if ($this->db->tableExists($table)) {
+            return;
+        }
+
+        $this->createTable($table, $columns);
+    }
+
+    /**
+     * Adds a foreign key only when one is not already there for those columns.
+     */
+    protected function addForeignKeyIfMissing(
+        string $table,
+        array $columns,
+        string $refTable,
+        array $refColumns,
+        ?string $delete,
+    ): void {
+        if (Db::findForeignKey($table, $columns) !== null) {
+            return;
+        }
+
+        $this->addForeignKey(null, $table, $columns, $refTable, $refColumns, $delete, null);
+    }
+
+    /**
      * Creates indexes.
      */
     protected function createIndexes(): void
     {
-        $this->createIndex(null, self::TABLE_FORMS, ['handle'], true);
+        $this->createIndexIfMissing(self::TABLE_FORMS, ['handle'], true);
 
-        $this->createIndex(null, self::TABLE_FORMFIELDS, ['formId'], false);
-        $this->createIndex(null, self::TABLE_FORMFIELDS, ['formId', 'handle'], true);
+        $this->createIndexIfMissing(self::TABLE_FORMFIELDS, ['formId'], false);
+        $this->createIndexIfMissing(self::TABLE_FORMFIELDS, ['formId', 'handle'], true);
 
-        $this->createIndex(null, self::TABLE_NOTIFICATIONS, ['formId'], false);
+        $this->createIndexIfMissing(self::TABLE_NOTIFICATIONS, ['formId'], false);
 
-        $this->createIndex(null, self::TABLE_SUBMISSIONS, ['formId'], false);
+        $this->createIndexIfMissing(self::TABLE_SUBMISSIONS, ['formId'], false);
 
-        $this->createIndex(null, self::TABLE_SENTNOTIFICATIONS, ['submissionId'], false);
-        $this->createIndex(null, self::TABLE_SENTNOTIFICATIONS, ['notificationId'], false);
+        $this->createIndexIfMissing(self::TABLE_SENTNOTIFICATIONS, ['submissionId'], false);
+        $this->createIndexIfMissing(self::TABLE_SENTNOTIFICATIONS, ['notificationId'], false);
 
-        $this->createIndex(null, self::TABLE_LOGS, ['formId'], false);
-        $this->createIndex(null, self::TABLE_LOGS, ['submissionId'], false);
-        $this->createIndex(null, self::TABLE_LOGS, ['dateCreated'], false);
+        $this->createIndexIfMissing(self::TABLE_LOGS, ['formId'], false);
+        $this->createIndexIfMissing(self::TABLE_LOGS, ['submissionId'], false);
+        $this->createIndexIfMissing(self::TABLE_LOGS, ['dateCreated'], false);
     }
 
     /**
@@ -188,18 +223,18 @@ class Install extends Migration
      */
     protected function addForeignKeys(): void
     {
-        $this->addForeignKey(null, self::TABLE_FORMFIELDS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE', null);
-        $this->addForeignKey(null, self::TABLE_NOTIFICATIONS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE', null);
+        $this->addForeignKeyIfMissing(self::TABLE_FORMFIELDS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE');
+        $this->addForeignKeyIfMissing(self::TABLE_NOTIFICATIONS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE');
 
         // A submission is an element: deleting the element row deletes the submission row.
-        $this->addForeignKey(null, self::TABLE_SUBMISSIONS, ['id'], Table::ELEMENTS, ['id'], 'CASCADE', null);
-        $this->addForeignKey(null, self::TABLE_SUBMISSIONS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE', null);
+        $this->addForeignKeyIfMissing(self::TABLE_SUBMISSIONS, ['id'], Table::ELEMENTS, ['id'], 'CASCADE');
+        $this->addForeignKeyIfMissing(self::TABLE_SUBMISSIONS, ['formId'], self::TABLE_FORMS, ['id'], 'CASCADE');
 
-        $this->addForeignKey(null, self::TABLE_SENTNOTIFICATIONS, ['submissionId'], self::TABLE_SUBMISSIONS, ['id'], 'CASCADE', null);
+        $this->addForeignKeyIfMissing(self::TABLE_SENTNOTIFICATIONS, ['submissionId'], self::TABLE_SUBMISSIONS, ['id'], 'CASCADE');
         // Keep the sent record when its notification row is deleted: it is history.
-        $this->addForeignKey(null, self::TABLE_SENTNOTIFICATIONS, ['notificationId'], self::TABLE_NOTIFICATIONS, ['id'], 'SET NULL', null);
+        $this->addForeignKeyIfMissing(self::TABLE_SENTNOTIFICATIONS, ['notificationId'], self::TABLE_NOTIFICATIONS, ['id'], 'SET NULL');
 
-        $this->addForeignKey(null, self::TABLE_LOGS, ['formId'], self::TABLE_FORMS, ['id'], 'SET NULL', null);
-        $this->addForeignKey(null, self::TABLE_LOGS, ['submissionId'], self::TABLE_SUBMISSIONS, ['id'], 'SET NULL', null);
+        $this->addForeignKeyIfMissing(self::TABLE_LOGS, ['formId'], self::TABLE_FORMS, ['id'], 'SET NULL');
+        $this->addForeignKeyIfMissing(self::TABLE_LOGS, ['submissionId'], self::TABLE_SUBMISSIONS, ['id'], 'SET NULL');
     }
 }

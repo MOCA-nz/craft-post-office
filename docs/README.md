@@ -1,6 +1,7 @@
 # Capture documentation
 
 - [Field types](field-types.md)
+- [Submissions](submissions.md)
 - [Form settings](form-settings.md)
 - [Notifications](notifications.md)
 - [Spam protection](spam.md)

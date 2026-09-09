@@ -5,6 +5,7 @@ namespace moca\capture\variables;
 use Craft;
 use craft\helpers\Template;
 use craft\web\View;
+use moca\capture\elements\db\SubmissionQuery;
 use moca\capture\elements\Submission;
 use moca\capture\models\Form;
 use moca\capture\Plugin;
@@ -33,11 +34,37 @@ class CaptureVariable
     }
 
     /**
+     * Returns a submission query.
+     *
+     * Craft's `craft.query()` is a generic database query builder and takes no element type,
+     * so without this there is no way to query submissions from a template at all.
+     *
+     *     {% for submission in craft.capture.submissions({ formId: form.id, limit: 5 }).all() %}
+     */
+    public function submissions(array $criteria = []): SubmissionQuery
+    {
+        /** @var SubmissionQuery $query */
+        $query = Submission::find();
+
+        if ($criteria !== []) {
+            Craft::configure($query, $criteria);
+        }
+
+        return $query;
+    }
+
+    /**
      * Returns how many submissions a form has received.
      */
-    public function submissionCount(int $formId): int
+    public function submissionCount(int $formId, ?int $siteId = null): int
     {
-        return (int)Submission::find()->formId($formId)->count();
+        $query = Submission::find()->formId($formId);
+
+        // Across every site by default: a count on a form's own screen means "how many have
+        // come in", not "how many on the site I happen to be viewing".
+        $query->siteId($siteId ?? '*');
+
+        return (int)$query->count();
     }
 
     /**

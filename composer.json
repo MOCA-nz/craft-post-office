@@ -43,17 +43,21 @@
   "require-dev": {
     "craftcms/ecs": "dev-main",
     "craftcms/phpstan": "dev-main",
-    "phpstan/phpstan": "^2.2"
+    "phpstan/phpstan": "^2.2",
+    "markhuot/craft-pest-core": "^3.2"
   },
   "scripts": {
     "check-cs": "ecs check --ansi",
     "fix-cs": "ecs check --fix --ansi",
-    "phpstan": "phpstan --memory-limit=1G"
+    "phpstan": "phpstan --memory-limit=1G",
+    "test": "pest"
   },
   "config": {
     "allow-plugins": {
       "yiisoft/yii2-composer": true,
-      "craftcms/plugin-installer": true
+      "craftcms/plugin-installer": true,
+      "pestphp/pest-plugin": true,
+      "php-http/discovery": true
     }
   }
 }

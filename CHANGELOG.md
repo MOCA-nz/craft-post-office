@@ -26,3 +26,7 @@
 - Field handles generated from the label as you type.
 - Paginated Sent Notifications and Logs screens, both pruned by Craft's garbage collection
   according to a configurable retention window.
+- Multi-site aware: a submission belongs to the site it was submitted from, and is never
+  propagated to others.
+- `craft.capture.submissions()` for querying submissions from a template.
+- A Pest test suite.
