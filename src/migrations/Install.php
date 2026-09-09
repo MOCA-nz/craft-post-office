@@ -3,6 +3,7 @@
 namespace moca\capture\migrations;
 
 use craft\db\Migration;
+use craft\db\Query;
 use craft\db\Table;
 
 /**
@@ -37,6 +38,20 @@ class Install extends Migration
      */
     public function safeDown(): bool
     {
+        // The elements rows belong to Craft, not to this plugin, so dropping the plugin's
+        // tables would strand one row per submission in `elements` forever. Delete them
+        // first, while capture_submissions still exists to identify which they are.
+        if ($this->db->tableExists(self::TABLE_SUBMISSIONS)) {
+            $submissionIds = (new Query())
+                ->select(['id'])
+                ->from([self::TABLE_SUBMISSIONS])
+                ->column($this->db);
+
+            if ($submissionIds !== []) {
+                $this->delete(Table::ELEMENTS, ['id' => $submissionIds]);
+            }
+        }
+
         // Dropped in reverse dependency order so foreign keys never block a drop.
         $this->dropTableIfExists(self::TABLE_LOGS);
         $this->dropTableIfExists(self::TABLE_SENTNOTIFICATIONS);

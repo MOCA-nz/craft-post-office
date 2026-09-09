@@ -2,6 +2,7 @@
 
 namespace moca\capture\models;
 
+use Craft;
 use craft\base\Model;
 use craft\validators\HandleValidator;
 use moca\capture\fields\FieldType;
@@ -63,12 +64,56 @@ class FormField extends Model
     }
 
     /**
-     * The message to show when this field fails validation.
+     * Renders a stored value for a human to read.
      *
-     * The builder only lets an editor set one message per field, so it covers both the
-     * required check and the type's implied check.
+     * Values are stored raw, which is what a template or an export wants. This is the other
+     * side of that: an option's label rather than its stored value, and Yes/No rather than 1,
+     * for the CP detail screen and notification emails.
      */
-    public function getErrorMessage(): string
+    public function formatValue(mixed $value): string
+    {
+        if ($this->getFieldType() === FieldType::Consent) {
+            return $value
+                ? Craft::t('capture', 'Yes')
+                : Craft::t('capture', 'No');
+        }
+
+        if (!$this->hasOptions()) {
+            return is_array($value) ? implode(', ', $value) : (string)$value;
+        }
+
+        $labels = [];
+
+        foreach ($this->getOptions() as $option) {
+            $labels[(string)($option['value'] ?? '')] = (string)($option['label'] ?? '');
+        }
+
+        $selected = is_array($value) ? $value : ($value === null || $value === '' ? [] : [$value]);
+
+        // An option removed from the form since submission has no label left, so fall back
+        // to the stored value rather than showing a blank.
+        return implode(', ', array_map(
+            static fn($v) => $labels[(string)$v] ?? (string)$v,
+            $selected,
+        ));
+    }
+
+    /**
+     * The message to show when this field is required but was left empty.
+     */
+    public function getRequiredMessage(): string
+    {
+        return $this->errorMessage ?: Craft::t('capture', '{label} is required.', ['label' => $this->label]);
+    }
+
+    /**
+     * The message to show when this field has a value that its type rejects.
+     *
+     * The builder only lets an editor set one message per field, so a custom message covers
+     * both this and the required case. Only the defaults differ, because "must be a valid
+     * email address" is the wrong thing to say about a field that is simply blank.
+     */
+    public function getTypeErrorMessage(): string
     {
         return $this->errorMessage ?: $this->getFieldType()->defaultErrorMessage($this->label);
     }

@@ -212,7 +212,7 @@ class Notifications extends Component
 
             $rows[] = [
                 'label' => $field->label,
-                'value' => is_array($value) ? implode(', ', $value) : (string)$value,
+                'value' => $field->formatValue($value),
             ];
         }
 

@@ -5,9 +5,11 @@ namespace moca\capture\elements;
 use Craft;
 use craft\base\Element;
 use yii\base\DynamicModel;
+use craft\elements\User;
 use craft\elements\db\ElementQueryInterface;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
+use moca\capture\controllers\SubmissionsController;
 use moca\capture\elements\db\SubmissionQuery;
 use moca\capture\models\Form;
 use moca\capture\Plugin;
@@ -174,7 +176,7 @@ class Submission extends Element
             $isEmpty = $value === null || $value === '' || $value === [];
 
             if ($field->required && $isEmpty) {
-                $this->addError($field->handle, $field->getErrorMessage());
+                $this->addError($field->handle, $field->getRequiredMessage());
                 continue;
             }
 
@@ -195,7 +197,7 @@ class Submission extends Element
             ]);
 
             if ($model->hasErrors()) {
-                $this->addError($field->handle, $field->getErrorMessage());
+                $this->addError($field->handle, $field->getTypeErrorMessage());
             }
         }
     }
@@ -331,7 +333,7 @@ class Submission extends Element
             $seen[$field->handle] = true;
             $rows[] = [
                 'label' => $field->label,
-                'value' => $this->_stringify($this->_values[$field->handle] ?? null),
+                'value' => $field->formatValue($this->_values[$field->handle] ?? null),
             ];
         }
 
@@ -351,6 +353,44 @@ class Submission extends Element
         }
 
         return (string)$value;
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Without this the element index renders the label as plain text: Craft only links a
+     * row through to its edit URL for elements the user is allowed to view.
+     */
+    public function canView(User $user): bool
+    {
+        return $user->can(SubmissionsController::PERMISSION_VIEW_SUBMISSIONS);
+    }
+
+    /**
+     * @inheritdoc
+     *
+     * Submissions are a record of what someone sent. Editing one would make it a record of
+     * what someone sent plus whatever was typed over it afterwards, so it is never editable.
+     */
+    public function canSave(User $user): bool
+    {
+        return false;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDelete(User $user): bool
+    {
+        return $user->can(SubmissionsController::PERMISSION_VIEW_SUBMISSIONS);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function canDuplicate(User $user): bool
+    {
+        return false;
     }
 
     /**

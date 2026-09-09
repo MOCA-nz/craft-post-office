@@ -4,6 +4,7 @@ namespace moca\capture\services;
 
 use Craft;
 use craft\db\Query;
+use craft\db\Table;
 use craft\events\ConfigEvent;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
@@ -107,6 +108,20 @@ class Forms extends Component
 
         if ($record === null) {
             return;
+        }
+
+        // Delete the submissions through the elements table, not through this table's own
+        // foreign key. That key runs elements -> submissions, so deleting the form would
+        // cascade the plugin rows away and strand their elements rows forever. Deleting the
+        // elements rows instead cascades in the direction the key actually points.
+        $submissionIds = (new Query())
+            ->select(['id'])
+            ->from([Install::TABLE_SUBMISSIONS])
+            ->where(['formId' => $record->id])
+            ->column();
+
+        if ($submissionIds !== []) {
+            Db::delete(Table::ELEMENTS, ['id' => $submissionIds]);
         }
 
         Db::delete(Install::TABLE_FORMS, ['id' => $record->id]);
