@@ -56,7 +56,7 @@ class SubmissionsController extends Controller
     {
         $submission = Submission::find()->id($submissionId)->one();
 
-        if ($submission === null) {
+        if (!$submission instanceof Submission) {
             throw new NotFoundHttpException('Submission not found');
         }
 

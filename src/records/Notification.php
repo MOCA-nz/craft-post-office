@@ -8,6 +8,12 @@ use moca\capture\migrations\Install;
 /**
  * @property int $id
  * @property int $formId
+ * @property string $kind
+ * @property string|null $recipientEmail
+ * @property string|null $templatePath
+ * @property bool $enabled
+ * @property int|null $sortOrder
+ * @property string $uid
  */
 class Notification extends ActiveRecord
 {

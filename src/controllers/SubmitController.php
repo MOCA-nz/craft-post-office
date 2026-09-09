@@ -3,7 +3,6 @@
 namespace moca\capture\controllers;
 
 use Craft;
-use craft\helpers\UrlHelper;
 use craft\web\Controller;
 use moca\capture\elements\Submission;
 use moca\capture\models\Form;
@@ -100,7 +99,7 @@ class SubmitController extends Controller
     /**
      * Reports a successful submission.
      */
-    private function _success(Form $form, Submission $submission): ?Response
+    private function _success(Form $form, Submission $submission): Response
     {
         $message = $form->successMessage ?: Craft::t('capture', 'Thanks, your message has been sent.');
 

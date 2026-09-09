@@ -42,9 +42,12 @@ type, so there is nothing else to configure and nothing to keep in sync.
 An empty optional field is never type-checked: only a field that has a value is checked
 against its type. That means a blank optional email field passes, and `not-an-email` does not.
 
-Your custom validation message covers both the required check and the type check. Leave it
-blank and Capture uses a default derived from the label, such as
-"Email must be a valid email address."
+Your custom validation message covers both the required check and the type check, because
+the builder only gives you one field for it.
+
+Leave it blank and Capture picks a default that suits whichever check failed. An email field
+left empty reads "Email is required."; one containing `not-an-email` reads "Email must be a
+valid email address." Only the defaults differ; a custom message replaces both.
 
 ## The email field
 

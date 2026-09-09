@@ -8,6 +8,10 @@ use moca\capture\migrations\Install;
 /**
  * @property int $id
  * @property int $formId
+ * @property string|null $values
+ * @property string|null $ipAddress
+ * @property string|null $userAgent
+ * @property string $uid
  */
 class Submission extends ActiveRecord
 {

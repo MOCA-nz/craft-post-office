@@ -4,15 +4,17 @@ namespace moca\capture\elements;
 
 use Craft;
 use craft\base\Element;
-use yii\base\DynamicModel;
-use craft\elements\User;
+use craft\elements\actions\Delete;
+use craft\elements\actions\Restore;
 use craft\elements\db\ElementQueryInterface;
+use craft\elements\User;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
 use moca\capture\controllers\SubmissionsController;
 use moca\capture\elements\db\SubmissionQuery;
 use moca\capture\models\Form;
 use moca\capture\Plugin;
+use yii\base\DynamicModel;
 
 /**
  * A single form submission.
@@ -98,6 +100,8 @@ class Submission extends Element
 
     /**
      * @inheritdoc
+     *
+     * @return SubmissionQuery
      */
     public static function find(): ElementQueryInterface
     {
@@ -265,6 +269,27 @@ class Submission extends Element
 
     /**
      * @inheritdoc
+     *
+     * Without this the index offers no bulk actions at all: canDelete() decides whether a
+     * delete is permitted, but the action still has to be registered to appear.
+     */
+    protected static function defineActions(string $source): array
+    {
+        // Config arrays and class strings, not instantiated actions: the element index
+        // filters this list by re-creating each entry, and an already-built instance falls
+        // through that filter, which silently drops Restore from the trash view.
+        return [
+            [
+                'type' => Delete::class,
+                'confirmationMessage' => Craft::t('capture', 'Are you sure you want to delete the selected submissions?'),
+                'successMessage' => Craft::t('capture', 'Submissions deleted.'),
+            ],
+            Restore::class,
+        ];
+    }
+
+    /**
+     * @inheritdoc
      */
     protected static function defineTableAttributes(): array
     {
@@ -309,7 +334,7 @@ class Submission extends Element
     protected function attributeHtml(string $attribute): string
     {
         return match ($attribute) {
-            'form' => Html::encode($this->getForm()?->name ?? ''),
+            'form' => Html::encode($this->getForm()->name ?? ''),
             'ipAddress' => Html::encode($this->ipAddress ?? ''),
             default => parent::attributeHtml($attribute),
         };
@@ -369,12 +394,17 @@ class Submission extends Element
     /**
      * @inheritdoc
      *
-     * Submissions are a record of what someone sent. Editing one would make it a record of
-     * what someone sent plus whatever was typed over it afterwards, so it is never editable.
+     * Submissions are a record of what someone sent, and the plugin offers no screen that
+     * edits one: the detail screen is read-only and there is no field layout to edit.
+     *
+     * This still has to return true, because Craft's Restore action checks canSave() before
+     * it will bring an element back from the trash. Returning false here reads as "immutable"
+     * but actually means "deletions are permanent", which is the worse failure for a form
+     * that collects enquiries.
      */
     public function canSave(User $user): bool
     {
-        return false;
+        return $user->can(SubmissionsController::PERMISSION_VIEW_SUBMISSIONS);
     }
 
     /**

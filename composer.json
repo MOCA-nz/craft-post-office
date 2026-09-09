@@ -39,5 +39,21 @@
     "documentationUrl": "https://github.com/MOCA-nz/craft-capture/blob/main/docs/README.md",
     "changelogUrl": "https://raw.githubusercontent.com/MOCA-nz/craft-capture/main/CHANGELOG.md",
     "class": "moca\\capture\\Plugin"
+  },
+  "require-dev": {
+    "craftcms/ecs": "dev-main",
+    "craftcms/phpstan": "dev-main",
+    "phpstan/phpstan": "^2.2"
+  },
+  "scripts": {
+    "check-cs": "ecs check --ansi",
+    "fix-cs": "ecs check --fix --ansi",
+    "phpstan": "phpstan --memory-limit=1G"
+  },
+  "config": {
+    "allow-plugins": {
+      "yiisoft/yii2-composer": true,
+      "craftcms/plugin-installer": true
+    }
   }
 }

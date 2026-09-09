@@ -7,7 +7,13 @@ use moca\capture\migrations\Install;
 
 /**
  * @property int $id
+ * @property int|null $formId
+ * @property int|null $submissionId
  * @property string $level
+ * @property string $event
+ * @property string $message
+ * @property string|null $context
+ * @property string $uid
  */
 class Log extends ActiveRecord
 {

@@ -66,7 +66,10 @@
         clearErrors();
         button.disabled = true;
 
-        fetch(form.action || window.location.href, {
+        // Not form.action: Craft's actionInput() emits <input name="action">, and a named
+        // form control shadows the form's own action property, so form.action returns that
+        // input element rather than a URL. The form posts to the current page anyway.
+        fetch(form.getAttribute('action') || window.location.href, {
           method: 'POST',
           body: new FormData(form),
           headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },

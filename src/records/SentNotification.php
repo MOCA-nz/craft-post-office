@@ -8,6 +8,12 @@ use moca\capture\migrations\Install;
 /**
  * @property int $id
  * @property int $submissionId
+ * @property int|null $notificationId
+ * @property string $recipientEmail
+ * @property string|null $subject
+ * @property string $status
+ * @property string|null $error
+ * @property string $uid
  */
 class SentNotification extends ActiveRecord
 {
