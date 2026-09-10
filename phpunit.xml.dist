@@ -4,7 +4,7 @@
          bootstrap="tests/bootstrap.php"
          colors="true">
     <testsuites>
-        <testsuite name="Capture">
+        <testsuite name="Post Office">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

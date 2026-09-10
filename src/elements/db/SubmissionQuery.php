@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\elements\db;
+namespace moca\postoffice\elements\db;
 
 use craft\elements\db\ElementQuery;
 use craft\helpers\Db;
@@ -30,19 +30,19 @@ class SubmissionQuery extends ElementQuery
      */
     protected function beforePrepare(): bool
     {
-        $this->joinElementTable('capture_submissions');
+        $this->joinElementTable('postoffice_submissions');
 
         // addSelect() rather than select(): additive, so other extensions contributing
         // columns are not clobbered.
         $this->query->addSelect([
-            'capture_submissions.formId',
-            'capture_submissions.values',
-            'capture_submissions.ipAddress',
-            'capture_submissions.userAgent',
+            'postoffice_submissions.formId',
+            'postoffice_submissions.values',
+            'postoffice_submissions.ipAddress',
+            'postoffice_submissions.userAgent',
         ]);
 
         if ($this->formId !== null) {
-            $this->subQuery->andWhere(Db::parseParam('capture_submissions.formId', $this->formId));
+            $this->subQuery->andWhere(Db::parseParam('postoffice_submissions.formId', $this->formId));
         }
 
         return parent::beforePrepare();

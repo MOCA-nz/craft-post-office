@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture;
+namespace moca\postoffice;
 
 use Craft;
 use craft\base\Model;
@@ -16,20 +16,20 @@ use craft\services\UserPermissions;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
-use moca\capture\controllers\SubmissionsController;
-use moca\capture\elements\Submission;
-use moca\capture\models\Settings;
-use moca\capture\services\Forms;
-use moca\capture\services\Log;
-use moca\capture\services\Notifications;
-use moca\capture\services\Spam;
-use moca\capture\services\Submissions;
-use moca\capture\services\ValueTemplate;
-use moca\capture\variables\CaptureVariable;
+use moca\postoffice\controllers\SubmissionsController;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Settings;
+use moca\postoffice\services\Forms;
+use moca\postoffice\services\Log;
+use moca\postoffice\services\Notifications;
+use moca\postoffice\services\Spam;
+use moca\postoffice\services\Submissions;
+use moca\postoffice\services\ValueTemplate;
+use moca\postoffice\variables\PostOfficeVariable;
 use yii\base\Event;
 
 /**
- * Capture: a contact form builder.
+ * Post Office: a contact form builder.
  *
  * Form definitions (forms, their fields and their notification rows) are structure and live
  * in project config, so a form built locally deploys to production. Submissions, sent
@@ -104,20 +104,20 @@ class Plugin extends BasePlugin
 
         $item['subnav'] = [
             'forms' => [
-                'label' => Craft::t('capture', 'Forms'),
-                'url' => 'capture/forms',
+                'label' => Craft::t('post-office', 'Forms'),
+                'url' => 'post-office/forms',
             ],
             'submissions' => [
-                'label' => Craft::t('capture', 'Submissions'),
-                'url' => 'capture/submissions',
+                'label' => Craft::t('post-office', 'Submissions'),
+                'url' => 'post-office/submissions',
             ],
             'sent-notifications' => [
-                'label' => Craft::t('capture', 'Sent Notifications'),
-                'url' => 'capture/sent-notifications',
+                'label' => Craft::t('post-office', 'Sent Notifications'),
+                'url' => 'post-office/sent-notifications',
             ],
             'logs' => [
-                'label' => Craft::t('capture', 'Logs'),
-                'url' => 'capture/logs',
+                'label' => Craft::t('post-office', 'Logs'),
+                'url' => 'post-office/logs',
             ],
         ];
 
@@ -129,7 +129,7 @@ class Plugin extends BasePlugin
      */
     public function getSettingsResponse(): mixed
     {
-        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('capture/settings'));
+        return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('post-office/settings'));
     }
 
     /**
@@ -158,10 +158,10 @@ class Plugin extends BasePlugin
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
             function(RegisterUserPermissionsEvent $event) {
                 $event->permissions[] = [
-                    'heading' => Craft::t('capture', 'Capture'),
+                    'heading' => Craft::t('post-office', 'Post Office'),
                     'permissions' => [
                         SubmissionsController::PERMISSION_VIEW_SUBMISSIONS => [
-                            'label' => Craft::t('capture', 'View submissions'),
+                            'label' => Craft::t('post-office', 'View submissions'),
                         ],
                     ],
                 ];
@@ -170,11 +170,11 @@ class Plugin extends BasePlugin
     }
 
     /**
-     * Makes the plugin's front-end templates addressable as `capture/*`.
+     * Makes the plugin's front-end templates addressable as `post-office/*`.
      *
      * Craft registers a plugin's templates for the control panel automatically, but not for
      * the site, so the front-end form templates need this. A project can override any of
-     * them by creating the same path under its own `templates/capture/` directory.
+     * them by creating the same path under its own `templates/post-office/` directory.
      */
     private function _registerSiteTemplateRoot(): void
     {
@@ -182,7 +182,7 @@ class Plugin extends BasePlugin
             View::class,
             View::EVENT_REGISTER_SITE_TEMPLATE_ROOTS,
             function(RegisterTemplateRootsEvent $event) {
-                $event->roots['capture'] = __DIR__ . '/templates/site';
+                $event->roots['post-office'] = __DIR__ . '/templates/site';
             }
         );
     }
@@ -218,7 +218,8 @@ class Plugin extends BasePlugin
             function(Event $event) {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
-                $variable->set('capture', CaptureVariable::class);
+                // camelCase, not the handle: `craft.post-office` is a subtraction in Twig.
+                $variable->set('postOffice', PostOfficeVariable::class);
             }
         );
     }
@@ -234,17 +235,17 @@ class Plugin extends BasePlugin
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
             function(RegisterUrlRulesEvent $event) {
-                $event->rules['capture'] = 'capture/forms/index';
-                $event->rules['capture/forms'] = 'capture/forms/index';
-                $event->rules['capture/forms/new'] = 'capture/forms/edit';
-                $event->rules['capture/forms/<formId:\d+>'] = 'capture/forms/edit';
-                $event->rules['capture/submissions'] = 'capture/submissions/index';
-                $event->rules['capture/submissions/<submissionId:\d+>'] = 'capture/submissions/view';
-                $event->rules['capture/sent-notifications'] = 'capture/notifications/index';
-                $event->rules['capture/logs'] = 'capture/logs/index';
-                $event->rules['capture/logs/<page:\d+>'] = 'capture/logs/index';
-                $event->rules['capture/sent-notifications/<page:\d+>'] = 'capture/notifications/index';
-                $event->rules['capture/settings'] = 'capture/settings/index';
+                $event->rules['post-office'] = 'post-office/forms/index';
+                $event->rules['post-office/forms'] = 'post-office/forms/index';
+                $event->rules['post-office/forms/new'] = 'post-office/forms/edit';
+                $event->rules['post-office/forms/<formId:\d+>'] = 'post-office/forms/edit';
+                $event->rules['post-office/submissions'] = 'post-office/submissions/index';
+                $event->rules['post-office/submissions/<submissionId:\d+>'] = 'post-office/submissions/view';
+                $event->rules['post-office/sent-notifications'] = 'post-office/notifications/index';
+                $event->rules['post-office/logs'] = 'post-office/logs/index';
+                $event->rules['post-office/logs/<page:\d+>'] = 'post-office/logs/index';
+                $event->rules['post-office/sent-notifications/<page:\d+>'] = 'post-office/notifications/index';
+                $event->rules['post-office/settings'] = 'post-office/settings/index';
             }
         );
     }

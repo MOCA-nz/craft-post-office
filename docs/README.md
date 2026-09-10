@@ -1,4 +1,4 @@
-# Capture documentation
+# Post Office documentation
 
 - [Field types](field-types.md)
 - [Submissions](submissions.md)

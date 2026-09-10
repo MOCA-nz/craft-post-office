@@ -1,9 +1,9 @@
 <?php
 
-use moca\capture\models\Form;
-use moca\capture\models\FormField;
-use moca\capture\models\Notification;
-use moca\capture\Plugin;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\FormField;
+use moca\postoffice\models\Notification;
+use moca\postoffice\Plugin;
 
 function makeForm(string $handle = 'testForm', array $fields = []): Form
 {
@@ -28,7 +28,7 @@ it('round-trips a form through project config into the database', function() {
 
     // Read back through a fresh service, so this asserts the project config handler wrote
     // the rows rather than that the model held on to them.
-    $fresh = (new \moca\capture\services\Forms())->getFormByHandle('roundTrip');
+    $fresh = (new \moca\postoffice\services\Forms())->getFormByHandle('roundTrip');
 
     expect($fresh)->not->toBeNull()
         ->and($fresh->name)->toBe('Test Form')
@@ -41,7 +41,7 @@ it('creates exactly one autoresponder, disabled, on first save', function() {
     $forms = Plugin::getInstance()->forms;
     $forms->saveForm(makeForm('autoOnce'));
 
-    $fresh = (new \moca\capture\services\Forms())->getFormByHandle('autoOnce');
+    $fresh = (new \moca\postoffice\services\Forms())->getFormByHandle('autoOnce');
     $autoresponders = array_filter($fresh->getNotifications(), fn($n) => $n->getIsAutoresponder());
 
     expect($autoresponders)->toHaveCount(1)
@@ -52,11 +52,11 @@ it('does not duplicate rows when a form is saved twice', function() {
     $forms = Plugin::getInstance()->forms;
     $forms->saveForm(makeForm('savedTwice'));
 
-    $again = (new \moca\capture\services\Forms())->getFormByHandle('savedTwice');
+    $again = (new \moca\postoffice\services\Forms())->getFormByHandle('savedTwice');
     $again->name = 'Renamed';
     Plugin::getInstance()->forms->saveForm($again);
 
-    $fresh = (new \moca\capture\services\Forms())->getFormByHandle('savedTwice');
+    $fresh = (new \moca\postoffice\services\Forms())->getFormByHandle('savedTwice');
 
     expect($fresh->name)->toBe('Renamed')
         ->and($fresh->getFields())->toHaveCount(2)

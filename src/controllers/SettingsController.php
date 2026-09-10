@@ -1,12 +1,12 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use Craft;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use moca\capture\models\Settings;
-use moca\capture\Plugin;
+use moca\postoffice\models\Settings;
+use moca\postoffice\Plugin;
 use yii\web\Response;
 
 /**
@@ -36,7 +36,7 @@ class SettingsController extends Controller
         /** @var Settings $settings */
         $settings = Plugin::getInstance()->getSettings();
 
-        return $this->renderTemplate('capture/settings/_index', [
+        return $this->renderTemplate('post-office/settings/_index', [
             'settings' => $settings,
             'readOnly' => !Craft::$app->getConfig()->getGeneral()->allowAdminChanges,
         ]);
@@ -60,14 +60,14 @@ class SettingsController extends Controller
         $settings->historyRetentionDays = (int)$this->request->getBodyParam('historyRetentionDays', 90);
 
         if (!Craft::$app->getPlugins()->savePluginSettings($plugin, $settings->toArray())) {
-            $this->setFailFlash(Craft::t('capture', 'Couldn’t save settings.'));
+            $this->setFailFlash(Craft::t('post-office', 'Couldn’t save settings.'));
             Craft::$app->getUrlManager()->setRouteParams(['settings' => $settings]);
 
             return null;
         }
 
-        $this->setSuccessFlash(Craft::t('capture', 'Settings saved.'));
+        $this->setSuccessFlash(Craft::t('post-office', 'Settings saved.'));
 
-        return $this->redirect(UrlHelper::cpUrl('capture/settings'));
+        return $this->redirect(UrlHelper::cpUrl('post-office/settings'));
     }
 }

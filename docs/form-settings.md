@@ -4,7 +4,7 @@ A form's **Settings** tab.
 
 ## Name and handle
 
-The handle is what you pass to `craft.capture.form()` and what identifies the form in posted
+The handle is what you pass to `craft.postOffice.form()` and what identifies the form in posted
 markup. Changing it will break any template referencing the old one.
 
 Handles follow Craft's own rule: start with a letter, then letters, numbers and underscores
@@ -35,7 +35,7 @@ success message set as a Craft flash notice.
 Redirect URL: /thanks
 ```
 
-**No reload** leaves the page in place. Capture's rendered form ships a small script that
+**No reload** leaves the page in place. Post Office's rendered form ships a small script that
 posts with `fetch()` and updates the page from the JSON response. If you write your own
 markup, you handle the response yourself, see [templating](templating.md).
 

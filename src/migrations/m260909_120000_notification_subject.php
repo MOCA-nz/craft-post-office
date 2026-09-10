@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\migrations;
+namespace moca\postoffice\migrations;
 
 use craft\db\Migration;
 

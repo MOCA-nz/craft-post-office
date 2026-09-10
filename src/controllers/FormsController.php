@@ -1,15 +1,15 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use Craft;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use moca\capture\fields\FieldType;
-use moca\capture\models\Form;
-use moca\capture\models\FormField;
-use moca\capture\models\Notification;
-use moca\capture\Plugin;
+use moca\postoffice\fields\FieldType;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\FormField;
+use moca\postoffice\models\Notification;
+use moca\postoffice\Plugin;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -41,7 +41,7 @@ class FormsController extends Controller
      */
     public function actionIndex(): Response
     {
-        return $this->renderTemplate('capture/forms/_index', [
+        return $this->renderTemplate('post-office/forms/_index', [
             'forms' => Plugin::getInstance()->forms->getAllForms(),
         ]);
     }
@@ -67,12 +67,12 @@ class FormsController extends Controller
             }
         }
 
-        return $this->renderTemplate('capture/forms/_edit', [
+        return $this->renderTemplate('post-office/forms/_edit', [
             'form' => $form,
             'isNew' => $form->id === null,
             'fieldTypes' => $this->_fieldTypeOptions(),
             'title' => $form->id === null
-                ? Craft::t('capture', 'Create a new form')
+                ? Craft::t('post-office', 'Create a new form')
                 : $form->name,
         ]);
     }
@@ -115,7 +115,7 @@ class FormsController extends Controller
         $form->setNotifications($this->_notificationsFromPost($form));
 
         if (!Plugin::getInstance()->forms->saveForm($form)) {
-            $this->setFailFlash(Craft::t('capture', 'Couldn’t save form.'));
+            $this->setFailFlash(Craft::t('post-office', 'Couldn’t save form.'));
 
             // Hand the populated model back to actionEdit() so nothing typed is lost.
             Craft::$app->getUrlManager()->setRouteParams(['form' => $form]);
@@ -123,7 +123,7 @@ class FormsController extends Controller
             return null;
         }
 
-        $this->setSuccessFlash(Craft::t('capture', 'Form saved.'));
+        $this->setSuccessFlash(Craft::t('post-office', 'Form saved.'));
 
         return $this->redirectToPostedUrl($form);
     }
@@ -148,9 +148,9 @@ class FormsController extends Controller
             return $this->asSuccess();
         }
 
-        $this->setSuccessFlash(Craft::t('capture', 'Form deleted.'));
+        $this->setSuccessFlash(Craft::t('post-office', 'Form deleted.'));
 
-        return $this->redirect(UrlHelper::cpUrl('capture/forms'));
+        return $this->redirect(UrlHelper::cpUrl('post-office/forms'));
     }
 
     /**

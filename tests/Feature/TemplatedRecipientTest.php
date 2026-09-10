@@ -1,10 +1,10 @@
 <?php
 
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
-use moca\capture\models\FormField;
-use moca\capture\Plugin;
-use moca\capture\services\ValueTemplate;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\FormField;
+use moca\postoffice\Plugin;
+use moca\postoffice\services\ValueTemplate;
 
 function agentForm(string $handle): Form
 {

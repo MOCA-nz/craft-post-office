@@ -1,15 +1,15 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
 use craft\db\Query;
 use craft\helpers\Db;
 use DateTime;
-use moca\capture\migrations\Install;
+use moca\postoffice\migrations\Install;
 use yii\base\Component;
 
 /**
- * Capture's own event log.
+ * Post Office's own event log.
  *
  * Deliberately not a view onto Craft's log files: this records only what the plugin does,
  * so the Logs screen stays small and every row is actionable.

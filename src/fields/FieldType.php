@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\fields;
+namespace moca\postoffice\fields;
 
 use Craft;
 
@@ -30,17 +30,17 @@ enum FieldType: string
     public function label(): string
     {
         return match ($this) {
-            self::Text => Craft::t('capture', 'Text'),
-            self::Email => Craft::t('capture', 'Email'),
-            self::Number => Craft::t('capture', 'Number'),
-            self::Tel => Craft::t('capture', 'Phone'),
-            self::Url => Craft::t('capture', 'URL'),
-            self::Textarea => Craft::t('capture', 'Textarea'),
-            self::Select => Craft::t('capture', 'Dropdown'),
-            self::Radio => Craft::t('capture', 'Radio buttons'),
-            self::Checkboxes => Craft::t('capture', 'Checkboxes'),
-            self::Consent => Craft::t('capture', 'Consent'),
-            self::Hidden => Craft::t('capture', 'Hidden'),
+            self::Text => Craft::t('post-office', 'Text'),
+            self::Email => Craft::t('post-office', 'Email'),
+            self::Number => Craft::t('post-office', 'Number'),
+            self::Tel => Craft::t('post-office', 'Phone'),
+            self::Url => Craft::t('post-office', 'URL'),
+            self::Textarea => Craft::t('post-office', 'Textarea'),
+            self::Select => Craft::t('post-office', 'Dropdown'),
+            self::Radio => Craft::t('post-office', 'Radio buttons'),
+            self::Checkboxes => Craft::t('post-office', 'Checkboxes'),
+            self::Consent => Craft::t('post-office', 'Consent'),
+            self::Hidden => Craft::t('post-office', 'Hidden'),
         };
     }
 
@@ -120,10 +120,10 @@ enum FieldType: string
     public function defaultErrorMessage(string $label): string
     {
         return match ($this) {
-            self::Email => Craft::t('capture', '{label} must be a valid email address.', ['label' => $label]),
-            self::Url => Craft::t('capture', '{label} must be a valid URL.', ['label' => $label]),
-            self::Number => Craft::t('capture', '{label} must be a number.', ['label' => $label]),
-            default => Craft::t('capture', '{label} is required.', ['label' => $label]),
+            self::Email => Craft::t('post-office', '{label} must be a valid email address.', ['label' => $label]),
+            self::Url => Craft::t('post-office', '{label} must be a valid URL.', ['label' => $label]),
+            self::Number => Craft::t('post-office', '{label} must be a number.', ['label' => $label]),
+            default => Craft::t('post-office', '{label} is required.', ['label' => $label]),
         };
     }
 

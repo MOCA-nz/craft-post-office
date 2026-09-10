@@ -1,37 +1,37 @@
 {#
   Renders a whole form.
 
-  Override by copying this file to templates/capture/_form.twig in your project. Everything
+  Override by copying this file to templates/post-office/_form.twig in your project. Everything
   it relies on is passed in, so an override can restructure the markup freely.
 #}
-{% set submission = captureSubmission ?? null %}
+{% set submission = postOfficeSubmission ?? null %}
 {% set values = submission ? submission.values : {} %}
 {% set errors = submission ? submission.fieldErrors : {} %}
 {% set isAjax = form.successBehavior == 'ajax' %}
 
 <form method="post"
       accept-charset="UTF-8"
-      class="capture-form"
-      data-capture-form="{{ form.handle }}"
-      {% if isAjax %}data-capture-ajax{% endif %}>
+      class="post-office-form"
+      data-post-office-form="{{ form.handle }}"
+      {% if isAjax %}data-post-office-ajax{% endif %}>
   {{ csrfInput() }}
-  {{ actionInput('capture/submit') }}
+  {{ actionInput('post-office/submit') }}
   {{ hiddenInput('formHandle', form.handle) }}
 
   {% if form.honeypotEnabled %}
     {# Bots fill anything they find. Hidden from people, and from screen readers. #}
     <div aria-hidden="true" style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden">
-      <label>{{ 'Leave this field empty'|t('capture') }}
+      <label>{{ 'Leave this field empty'|t('post-office') }}
         <input type="text" name="{{ honeypotField }}" value="" tabindex="-1" autocomplete="off">
       </label>
     </div>
     <input type="hidden" name="{{ timestampField }}" value="{{ timestamp }}">
   {% endif %}
 
-  <div class="capture-message" data-capture-message hidden></div>
+  <div class="post-office-message" data-post-office-message hidden></div>
 
   {% for field in form.fields %}
-    {% include 'capture/_field' with {
+    {% include 'post-office/_field' with {
       form: form,
       field: field,
       values: values,
@@ -39,25 +39,25 @@
     } only %}
   {% endfor %}
 
-  <button type="submit" class="capture-submit">{{ 'Send'|t('capture') }}</button>
+  <button type="submit" class="post-office-submit">{{ 'Send'|t('post-office') }}</button>
 </form>
 
 {% if isAjax %}
   {% js %}
     (function () {
-      var form = document.querySelector('[data-capture-form="{{ form.handle }}"][data-capture-ajax]');
-      if (!form || form.dataset.captureBound) return;
-      form.dataset.captureBound = '1';
+      var form = document.querySelector('[data-post-office-form="{{ form.handle }}"][data-post-office-ajax]');
+      if (!form || form.dataset.postOfficeBound) return;
+      form.dataset.postOfficeBound = '1';
 
-      var message = form.querySelector('[data-capture-message]');
+      var message = form.querySelector('[data-post-office-message]');
       var button = form.querySelector('[type=submit]');
 
       function clearErrors() {
-        form.querySelectorAll('[data-capture-error]').forEach(function (el) {
+        form.querySelectorAll('[data-post-office-error]').forEach(function (el) {
           el.textContent = '';
           el.hidden = true;
-          var wrap = el.closest('.capture-field');
-          if (wrap) wrap.classList.remove('capture-field--error');
+          var wrap = el.closest('.post-office-field');
+          if (wrap) wrap.classList.remove('post-office-field--error');
         });
       }
 
@@ -78,7 +78,7 @@
           .then(function (data) {
             message.hidden = false;
             message.textContent = data.message || '';
-            message.className = 'capture-message capture-message--' + (data.success ? 'success' : 'error');
+            message.className = 'post-office-message post-office-message--' + (data.success ? 'success' : 'error');
 
             if (data.success) {
               form.reset();
@@ -86,18 +86,18 @@
             }
 
             Object.keys(data.errors || {}).forEach(function (handle) {
-              var el = form.querySelector('[data-capture-error="' + handle + '"]');
+              var el = form.querySelector('[data-post-office-error="' + handle + '"]');
               if (!el) return;
               el.textContent = data.errors[handle][0];
               el.hidden = false;
-              var wrap = el.closest('.capture-field');
-              if (wrap) wrap.classList.add('capture-field--error');
+              var wrap = el.closest('.post-office-field');
+              if (wrap) wrap.classList.add('post-office-field--error');
             });
           })
           .catch(function () {
             message.hidden = false;
-            message.className = 'capture-message capture-message--error';
-            message.textContent = '{{ 'Something went wrong. Please try again.'|t('capture') }}';
+            message.className = 'post-office-message post-office-message--error';
+            message.textContent = '{{ 'Something went wrong. Please try again.'|t('post-office') }}';
           })
           .finally(function () { button.disabled = false; });
       });

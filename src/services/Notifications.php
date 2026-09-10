@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
 use Craft;
 use craft\db\Query;
@@ -8,18 +8,18 @@ use craft\helpers\App;
 use craft\helpers\Db;
 use craft\web\View;
 use DateTime;
-use moca\capture\elements\Submission;
-use moca\capture\migrations\Install;
-use moca\capture\models\Form;
-use moca\capture\models\Notification;
-use moca\capture\Plugin;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\migrations\Install;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\Notification;
+use moca\postoffice\Plugin;
 use Throwable;
 use yii\base\Component;
 
 /**
  * Outgoing email, and the record of what was sent.
  *
- * One row is written to capture_sentnotifications per attempted send, successful or not, so
+ * One row is written to postoffice_sentnotifications per attempted send, successful or not, so
  * the Sent Notifications screen is a complete history rather than a success log.
  */
 class Notifications extends Component
@@ -103,7 +103,7 @@ class Notifications extends Component
     public function render(Notification $notification, Submission $submission, Form $form): string
     {
         $view = Craft::$app->getView();
-        $template = $notification->templatePath ?: 'capture/_email';
+        $template = $notification->templatePath ?: 'post-office/_email';
 
         $variables = [
             'submission' => $submission,
@@ -184,7 +184,7 @@ class Notifications extends Component
                 $notification,
                 $submission,
                 $template,
-                Craft::t('capture', 'Unresolved recipient'),
+                Craft::t('post-office', 'Unresolved recipient'),
                 self::STATUS_FAILED,
                 implode(' ', $errors),
             );

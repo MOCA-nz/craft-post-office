@@ -23,7 +23,7 @@ Costs nothing, needs no configuration, and adds no friction for visitors.
 
 ## reCAPTCHA and Turnstile
 
-Both need two keys, set on **Capture > Settings**:
+Both need two keys, set on **Post Office > Settings**:
 
 - Site key, rendered into your form
 - Secret key, used server-side to verify
@@ -44,7 +44,7 @@ submission is rejected and the reason is logged. A captcha that silently accepts
 when misconfigured is worse than one that visibly rejects.
 
 You are responsible for rendering the widget itself in your markup, and for posting the
-`g-recaptcha-response` or `cf-turnstile-response` parameter. Capture verifies whichever one
+`g-recaptcha-response` or `cf-turnstile-response` parameter. Post Office verifies whichever one
 the form has enabled.
 
 ## What a rejection looks like

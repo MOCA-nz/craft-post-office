@@ -1,10 +1,10 @@
 <?php
 
-namespace moca\capture\models;
+namespace moca\postoffice\models;
 
 use Craft;
 use craft\base\Model;
-use moca\capture\Plugin;
+use moca\postoffice\Plugin;
 
 /**
  * One outgoing email rule on a form.
@@ -54,8 +54,8 @@ class Notification extends Model
     public function getDefaultSubject(string $formName): string
     {
         return $this->getIsAutoresponder()
-            ? Craft::t('capture', 'Thanks for getting in touch')
-            : Craft::t('capture', 'New {form} submission', ['form' => $formName]);
+            ? Craft::t('post-office', 'Thanks for getting in touch')
+            : Craft::t('post-office', 'New {form} submission', ['form' => $formName]);
     }
 
     /**

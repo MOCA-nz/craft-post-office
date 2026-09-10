@@ -2,10 +2,10 @@
 
 use craft\db\Query;
 use craft\db\Table;
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
-use moca\capture\models\FormField;
-use moca\capture\Plugin;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\FormField;
+use moca\postoffice\Plugin;
 
 function submissionForm(string $handle): Form
 {
@@ -108,6 +108,6 @@ it('leaves no orphaned element rows when a form is deleted', function() {
 
     Plugin::getInstance()->forms->deleteForm($form);
 
-    expect((new Query())->from(['{{%capture_submissions}}'])->where(['formId' => $form->id])->count())->toEqual(0)
+    expect((new Query())->from(['{{%postoffice_submissions}}'])->where(['formId' => $form->id])->count())->toEqual(0)
         ->and((int)$countElements())->toBe((int)$before - 2);
 });

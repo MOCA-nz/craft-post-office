@@ -2,7 +2,7 @@
 
 {% set title = submission.uiLabel %}
 {% set crumbs = [
-  { label: 'Submissions'|t('capture'), url: url('capture/submissions') },
+  { label: 'Submissions'|t('post-office'), url: url('post-office/submissions') },
 ] %}
 
 {% block content %}
@@ -17,17 +17,17 @@
     </tbody>
   </table>
 
-  <h2 style="margin-top: 24px;">{{ 'Notifications sent'|t('capture') }}</h2>
+  <h2 style="margin-top: 24px;">{{ 'Notifications sent'|t('post-office') }}</h2>
 
   {% if sent is empty %}
-    <p class="light">{{ 'No notifications were sent for this submission.'|t('capture') }}</p>
+    <p class="light">{{ 'No notifications were sent for this submission.'|t('post-office') }}</p>
   {% else %}
     <table class="data fullwidth">
       <thead>
         <tr>
-          <th scope="col">{{ 'Recipient'|t('capture') }}</th>
-          <th scope="col">{{ 'Status'|t('capture') }}</th>
-          <th scope="col">{{ 'Sent'|t('capture') }}</th>
+          <th scope="col">{{ 'Recipient'|t('post-office') }}</th>
+          <th scope="col">{{ 'Status'|t('post-office') }}</th>
+          <th scope="col">{{ 'Sent'|t('post-office') }}</th>
         </tr>
       </thead>
       <tbody>
@@ -50,21 +50,21 @@
 {% block details %}
   <div class="meta read-only">
     <div class="data">
-      <h5 class="heading">{{ 'Form'|t('capture') }}</h5>
+      <h5 class="heading">{{ 'Form'|t('post-office') }}</h5>
       <div class="value">
         {%- if form -%}
-          <a href="{{ url('capture/forms/' ~ form.id) }}">{{ form.name }}</a>
+          <a href="{{ url('post-office/forms/' ~ form.id) }}">{{ form.name }}</a>
         {%- else -%}
-          {{ 'Deleted'|t('capture') }}
+          {{ 'Deleted'|t('post-office') }}
         {%- endif -%}
       </div>
     </div>
     <div class="data">
-      <h5 class="heading">{{ 'Date Submitted'|t('capture') }}</h5>
+      <h5 class="heading">{{ 'Date Submitted'|t('post-office') }}</h5>
       <div class="value">{{ submission.dateCreated|datetime('short') }}</div>
     </div>
     <div class="data">
-      <h5 class="heading">{{ 'IP address'|t('capture') }}</h5>
+      <h5 class="heading">{{ 'IP address'|t('post-office') }}</h5>
       <div class="value">{{ submission.ipAddress ?: '—' }}</div>
     </div>
   </div>

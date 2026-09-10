@@ -10,7 +10,7 @@ Each form has its own list of outgoing emails, on the form's **Settings** tab.
 |---|---|
 | Recipient | Where it goes. Accepts an environment variable reference |
 | Subject | The subject line. Leave blank for "New {form name} submission" |
-| Email template | The Twig template that renders the body. Leave blank for Capture's default |
+| Email template | The Twig template that renders the body. Leave blank for Post Office's default |
 | Enabled | Whether this row sends |
 
 Add as many as you need. Three rows means three separate emails, each able to use a different
@@ -112,9 +112,9 @@ access by handle when you want to build something specific.
 <p>Received {{ submission.dateCreated|datetime('short') }}</p>
 ```
 
-Leave the template blank and Capture renders its own, which is a table of `rows` plus the
+Leave the template blank and Post Office renders its own, which is a table of `rows` plus the
 submission date. To restyle the default for every form at once, copy the plugin's
-`src/templates/site/_email.twig` to `templates/capture/_email.twig` in your project.
+`src/templates/site/_email.twig` to `templates/post-office/_email.twig` in your project.
 
 ## Subjects
 

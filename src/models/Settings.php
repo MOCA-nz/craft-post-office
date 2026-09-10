@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\models;
+namespace moca\postoffice\models;
 
 use craft\base\Model;
 

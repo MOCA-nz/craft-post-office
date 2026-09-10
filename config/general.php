@@ -10,7 +10,7 @@
 
 return [
     'devMode' => true,
-    'securityKey' => 'capture-test-security-key',
+    'securityKey' => 'post-office-test-security-key',
     // Pinned to UTC so datetimes in tests match what Craft stores. Craft's own install
     // migration seeds America/Los_Angeles, which shifts every comparison by the offset.
     'timezone' => 'UTC',

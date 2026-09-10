@@ -1,4 +1,4 @@
-# Release Notes for Capture
+# Release Notes for Post Office
 
 ## 1.0.0 - 2026-09-09
 
@@ -18,7 +18,7 @@
 - Logs screen for the plugin's own events.
 - Spam protection: honeypot with a minimum time-to-submit, reCAPTCHA and Turnstile, each
   switched on or off per form.
-- Front-end rendering through `craft.capture.form('handle')`, with fully overridable
+- Front-end rendering through `craft.postOffice.form('handle')`, with fully overridable
   templates, plus a JSON endpoint for hand-written markup.
 - Notification subjects set per notification, falling back to a sensible default.
 - Notifications are queued rather than sent during the visitor's request.
@@ -28,5 +28,5 @@
   according to a configurable retention window.
 - Multi-site aware: a submission belongs to the site it was submitted from, and is never
   propagated to others.
-- `craft.capture.submissions()` for querying submissions from a template.
+- `craft.postOffice.submissions()` for querying submissions from a template.
 - A Pest test suite.

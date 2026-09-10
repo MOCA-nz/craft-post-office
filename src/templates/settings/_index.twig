@@ -1,37 +1,37 @@
 {% extends '_layouts/cp' %}
 {% import '_includes/forms' as forms %}
 
-{% set title = 'Capture Settings'|t('capture') %}
+{% set title = 'Post Office Settings'|t('post-office') %}
 {% set fullPageForm = not readOnly %}
-{% set crumbs = [{ label: 'Capture'|t('capture'), url: url('capture/forms') }] %}
+{% set crumbs = [{ label: 'Post Office'|t('post-office'), url: url('post-office/forms') }] %}
 
 {% block content %}
-  {{ actionInput('capture/settings/save') }}
+  {{ actionInput('post-office/settings/save') }}
 
   <p class="light">
-    {{ 'Keys are stored in project config, so give each one an environment variable reference rather than the key itself. Which of these run is set per form, on the form’s Settings tab.'|t('capture') }}
+    {{ 'Keys are stored in project config, so give each one an environment variable reference rather than the key itself. Which of these run is set per form, on the form’s Settings tab.'|t('post-office') }}
   </p>
 
-  <h2>{{ 'History'|t('capture') }}</h2>
+  <h2>{{ 'History'|t('post-office') }}</h2>
 
   {{ forms.textField({
-    label: 'Keep history for'|t('capture'),
-    instructions: 'How many days of sent notifications and log entries to keep. Craft’s garbage collection removes anything older. Set to 0 to keep everything forever.'|t('capture'),
+    label: 'Keep history for'|t('post-office'),
+    instructions: 'How many days of sent notifications and log entries to keep. Craft’s garbage collection removes anything older. Set to 0 to keep everything forever.'|t('post-office'),
     name: 'historyRetentionDays',
     value: settings.historyRetentionDays,
     type: 'number',
     size: 5,
-    unit: 'days'|t('capture'),
+    unit: 'days'|t('post-office'),
     disabled: readOnly,
     errors: settings.getErrors('historyRetentionDays'),
   }) }}
 
   <hr>
 
-  <h2>{{ 'reCAPTCHA'|t('capture') }}</h2>
+  <h2>{{ 'reCAPTCHA'|t('post-office') }}</h2>
 
   {{ forms.autosuggestField({
-    label: 'Site key'|t('capture'),
+    label: 'Site key'|t('post-office'),
     name: 'recaptchaSiteKey',
     value: settings.recaptchaSiteKey,
     suggestEnvVars: true,
@@ -39,7 +39,7 @@
   }) }}
 
   {{ forms.autosuggestField({
-    label: 'Secret key'|t('capture'),
+    label: 'Secret key'|t('post-office'),
     name: 'recaptchaSecretKey',
     value: settings.recaptchaSecretKey,
     suggestEnvVars: true,
@@ -48,10 +48,10 @@
 
   <hr>
 
-  <h2>{{ 'Turnstile'|t('capture') }}</h2>
+  <h2>{{ 'Turnstile'|t('post-office') }}</h2>
 
   {{ forms.autosuggestField({
-    label: 'Site key'|t('capture'),
+    label: 'Site key'|t('post-office'),
     name: 'turnstileSiteKey',
     value: settings.turnstileSiteKey,
     suggestEnvVars: true,
@@ -59,7 +59,7 @@
   }) }}
 
   {{ forms.autosuggestField({
-    label: 'Secret key'|t('capture'),
+    label: 'Secret key'|t('post-office'),
     name: 'turnstileSecretKey',
     value: settings.turnstileSecretKey,
     suggestEnvVars: true,
@@ -68,7 +68,7 @@
 
   {% if readOnly %}
     <p class="warning">
-      {{ 'Administrative changes are disabled in this environment.'|t('capture') }}
+      {{ 'Administrative changes are disabled in this environment.'|t('post-office') }}
     </p>
   {% endif %}
 {% endblock %}

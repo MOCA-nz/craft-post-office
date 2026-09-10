@@ -1,12 +1,12 @@
 <?php
 
-namespace moca\capture\elements\exporters;
+namespace moca\postoffice\elements\exporters;
 
 use Craft;
 use craft\base\ElementExporter;
 use craft\elements\db\ElementQueryInterface;
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
 
 /**
  * Exports submissions with a column per form field.
@@ -25,7 +25,7 @@ class SubmissionExport extends ElementExporter
      */
     public static function displayName(): string
     {
-        return Craft::t('capture', 'Submissions');
+        return Craft::t('post-office', 'Submissions');
     }
 
     /**
@@ -59,10 +59,10 @@ class SubmissionExport extends ElementExporter
 
         foreach ($submissions as $submission) {
             $row = [
-                Craft::t('capture', 'ID') => $submission->id,
-                Craft::t('capture', 'Form') => $submission->getForm()->name ?? '',
-                Craft::t('capture', 'Date Submitted') => $submission->dateCreated?->format('Y-m-d H:i:s'),
-                Craft::t('capture', 'IP address') => $submission->ipAddress,
+                Craft::t('post-office', 'ID') => $submission->id,
+                Craft::t('post-office', 'Form') => $submission->getForm()->name ?? '',
+                Craft::t('post-office', 'Date Submitted') => $submission->dateCreated?->format('Y-m-d H:i:s'),
+                Craft::t('post-office', 'IP address') => $submission->ipAddress,
             ];
 
             $fields = $this->_fieldsByHandle($submission->getForm());
@@ -91,7 +91,7 @@ class SubmissionExport extends ElementExporter
     }
 
     /**
-     * @return array<string, \moca\capture\models\FormField>
+     * @return array<string, \moca\postoffice\models\FormField>
      */
     private function _fieldsByHandle(?Form $form): array
     {

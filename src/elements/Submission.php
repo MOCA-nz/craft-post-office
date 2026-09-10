@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\elements;
+namespace moca\postoffice\elements;
 
 use Craft;
 use craft\base\Element;
@@ -10,12 +10,12 @@ use craft\elements\db\ElementQueryInterface;
 use craft\elements\User;
 use craft\helpers\Html;
 use craft\helpers\UrlHelper;
-use moca\capture\controllers\SubmissionsController;
-use moca\capture\elements\db\SubmissionQuery;
-use moca\capture\elements\exporters\SubmissionExport;
-use moca\capture\models\Form;
-use moca\capture\Plugin;
-use moca\capture\queue\jobs\SendNotifications;
+use moca\postoffice\controllers\SubmissionsController;
+use moca\postoffice\elements\db\SubmissionQuery;
+use moca\postoffice\elements\exporters\SubmissionExport;
+use moca\postoffice\models\Form;
+use moca\postoffice\Plugin;
+use moca\postoffice\queue\jobs\SendNotifications;
 use yii\base\DynamicModel;
 
 /**
@@ -57,7 +57,7 @@ class Submission extends Element
      */
     public static function displayName(): string
     {
-        return Craft::t('capture', 'Submission');
+        return Craft::t('post-office', 'Submission');
     }
 
     /**
@@ -65,7 +65,7 @@ class Submission extends Element
      */
     public static function pluralDisplayName(): string
     {
-        return Craft::t('capture', 'Submissions');
+        return Craft::t('post-office', 'Submissions');
     }
 
     /**
@@ -275,7 +275,7 @@ class Submission extends Element
             }
         }
 
-        return Craft::t('capture', 'Submission {id}', ['id' => $this->id]);
+        return Craft::t('post-office', 'Submission {id}', ['id' => $this->id]);
     }
 
     /**
@@ -288,7 +288,7 @@ class Submission extends Element
         $sources = [
             [
                 'key' => '*',
-                'label' => Craft::t('capture', 'All submissions'),
+                'label' => Craft::t('post-office', 'All submissions'),
                 'defaultSort' => ['dateCreated', 'desc'],
             ],
         ];
@@ -319,8 +319,8 @@ class Submission extends Element
         return [
             [
                 'type' => Delete::class,
-                'confirmationMessage' => Craft::t('capture', 'Are you sure you want to delete the selected submissions?'),
-                'successMessage' => Craft::t('capture', 'Submissions deleted.'),
+                'confirmationMessage' => Craft::t('post-office', 'Are you sure you want to delete the selected submissions?'),
+                'successMessage' => Craft::t('post-office', 'Submissions deleted.'),
             ],
             Restore::class,
         ];
@@ -348,11 +348,11 @@ class Submission extends Element
         // No column for the submission's own label: Craft always renders that as the first
         // column, so adding one here just repeats it.
         return [
-            'id' => ['label' => Craft::t('capture', 'ID')],
-            'form' => ['label' => Craft::t('capture', 'Form')],
-            'site' => ['label' => Craft::t('capture', 'Site')],
-            'ipAddress' => ['label' => Craft::t('capture', 'IP address')],
-            'dateCreated' => ['label' => Craft::t('capture', 'Date')],
+            'id' => ['label' => Craft::t('post-office', 'ID')],
+            'form' => ['label' => Craft::t('post-office', 'Form')],
+            'site' => ['label' => Craft::t('post-office', 'Site')],
+            'ipAddress' => ['label' => Craft::t('post-office', 'IP address')],
+            'dateCreated' => ['label' => Craft::t('post-office', 'Date')],
         ];
     }
 
@@ -370,8 +370,8 @@ class Submission extends Element
     protected static function defineSortOptions(): array
     {
         return [
-            'dateCreated' => Craft::t('capture', 'Date submitted'),
-            'id' => Craft::t('capture', 'ID'),
+            'dateCreated' => Craft::t('post-office', 'Date submitted'),
+            'id' => Craft::t('post-office', 'ID'),
         ];
     }
 
@@ -484,7 +484,7 @@ class Submission extends Element
      */
     public function getCpEditUrl(): ?string
     {
-        return UrlHelper::cpUrl("capture/submissions/$this->id");
+        return UrlHelper::cpUrl("post-office/submissions/$this->id");
     }
 
     /**

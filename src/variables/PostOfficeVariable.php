@@ -1,21 +1,21 @@
 <?php
 
-namespace moca\capture\variables;
+namespace moca\postoffice\variables;
 
 use Craft;
 use craft\helpers\Template;
 use craft\web\View;
-use moca\capture\elements\db\SubmissionQuery;
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
-use moca\capture\Plugin;
-use moca\capture\services\Spam;
+use moca\postoffice\elements\db\SubmissionQuery;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
+use moca\postoffice\Plugin;
+use moca\postoffice\services\Spam;
 use Twig\Markup;
 
 /**
- * `craft.capture` in Twig.
+ * `craft.postOffice` in Twig.
  */
-class CaptureVariable
+class PostOfficeVariable
 {
     /**
      * Returns a form definition by handle.
@@ -39,7 +39,7 @@ class CaptureVariable
      * Craft's `craft.query()` is a generic database query builder and takes no element type,
      * so without this there is no way to query submissions from a template at all.
      *
-     *     {% for submission in craft.capture.submissions({ formId: form.id, limit: 5 }).all() %}
+     *     {% for submission in craft.postOffice.submissions({ formId: form.id, limit: 5 }).all() %}
      */
     public function submissions(array $criteria = []): SubmissionQuery
     {
@@ -85,11 +85,11 @@ class CaptureVariable
 
         // A failed submission is handed back by SubmitController through route params, so
         // the re-rendered form keeps what the visitor typed and shows the errors.
-        $submission = Craft::$app->getUrlManager()->getRouteParams()['captureSubmission'] ?? null;
+        $submission = Craft::$app->getUrlManager()->getRouteParams()['postOfficeSubmission'] ?? null;
 
-        $html = $view->renderTemplate('capture/_form', [
+        $html = $view->renderTemplate('post-office/_form', [
             'form' => $form,
-            'captureSubmission' => $submission instanceof Submission && $submission->formId === $form->id
+            'postOfficeSubmission' => $submission instanceof Submission && $submission->formId === $form->id
                 ? $submission
                 : null,
             'honeypotField' => Spam::HONEYPOT_FIELD,

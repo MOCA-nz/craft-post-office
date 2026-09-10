@@ -1,13 +1,13 @@
 <?php
 
-namespace moca\capture\models;
+namespace moca\postoffice\models;
 
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
-use moca\capture\records\Form as FormRecord;
+use moca\postoffice\records\Form as FormRecord;
 
 /**
  * A form definition.
@@ -158,7 +158,7 @@ class Form extends Model
 
             if (!$field->validate()) {
                 foreach ($field->getFirstErrors() as $message) {
-                    $this->addError('fields', Craft::t('capture', 'Field {position}: {message}', [
+                    $this->addError('fields', Craft::t('post-office', 'Field {position}: {message}', [
                         'position' => $position,
                         'message' => $message,
                     ]));
@@ -168,7 +168,7 @@ class Form extends Model
             }
 
             if (isset($seen[$field->handle])) {
-                $this->addError('fields', Craft::t('capture', 'More than one field uses the handle “{handle}”. Handles must be unique within a form.', [
+                $this->addError('fields', Craft::t('post-office', 'More than one field uses the handle “{handle}”. Handles must be unique within a form.', [
                     'handle' => $field->handle,
                 ]));
 

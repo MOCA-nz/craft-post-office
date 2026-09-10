@@ -50,7 +50,7 @@ against its type. That means a blank optional email field passes, and `not-an-em
 Your custom validation message covers both the required check and the type check, because
 the builder only gives you one field for it.
 
-Leave it blank and Capture picks a default that suits whichever check failed. An email field
+Leave it blank and Post Office picks a default that suits whichever check failed. An email field
 left empty reads "Email is required."; one containing `not-an-email` reads "Email must be a
 valid email address." Only the defaults differ; a custom message replaces both.
 

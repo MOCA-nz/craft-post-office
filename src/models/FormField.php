@@ -1,11 +1,11 @@
 <?php
 
-namespace moca\capture\models;
+namespace moca\postoffice\models;
 
 use Craft;
 use craft\base\Model;
 use craft\validators\HandleValidator;
-use moca\capture\fields\FieldType;
+use moca\postoffice\fields\FieldType;
 
 /**
  * One field on a form.
@@ -74,8 +74,8 @@ class FormField extends Model
     {
         if ($this->getFieldType() === FieldType::Consent) {
             return $value
-                ? Craft::t('capture', 'Yes')
-                : Craft::t('capture', 'No');
+                ? Craft::t('post-office', 'Yes')
+                : Craft::t('post-office', 'No');
         }
 
         if (!$this->hasOptions()) {
@@ -103,7 +103,7 @@ class FormField extends Model
      */
     public function getRequiredMessage(): string
     {
-        return $this->errorMessage ?: Craft::t('capture', '{label} is required.', ['label' => $this->label]);
+        return $this->errorMessage ?: Craft::t('post-office', '{label} is required.', ['label' => $this->label]);
     }
 
     /**

@@ -1,9 +1,9 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
 use yii\base\Component;
 
 /**
@@ -97,7 +97,7 @@ class ValueTemplate extends Component
     }
 
     /**
-     * @return array<string, \moca\capture\models\FormField>
+     * @return array<string, \moca\postoffice\models\FormField>
      */
     private function _fieldsByHandle(Form $form): array
     {

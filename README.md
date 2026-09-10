@@ -1,20 +1,20 @@
-[![Stable Version](https://img.shields.io/packagist/v/moca-nz/craft-capture?label=stable)](https://packagist.org/packages/moca-nz/craft-capture)
-[![Total Downloads](https://img.shields.io/packagist/dt/moca-nz/craft-capture)](https://packagist.org/packages/moca-nz/craft-capture)
+[![Stable Version](https://img.shields.io/packagist/v/moca-nz/craft-post-office?label=stable)](https://packagist.org/packages/moca-nz/craft-post-office)
+[![Total Downloads](https://img.shields.io/packagist/dt/moca-nz/craft-post-office)](https://packagist.org/packages/moca-nz/craft-post-office)
 
-<p align="center"><img width="150" src="https://raw.githubusercontent.com/MOCA-nz/craft-capture/main/src/icon.svg"></p>
+<p align="center"><img width="150" src="https://raw.githubusercontent.com/MOCA-nz/craft-post-office/main/src/icon.svg"></p>
 
-# Capture, a Plugin for Craft CMS
+# Post Office, a Plugin for Craft CMS
 
 ### Contact forms that store submissions as elements and email from your own templates.
 
-Capture is a free plugin for [Craft CMS](https://craftcms.com/) for building contact forms in
+Post Office is a free plugin for [Craft CMS](https://craftcms.com/) for building contact forms in
 the control panel. Submissions are stored as Craft elements, so they get the element index,
 search, filtering and CSV export for free. Notification emails render from your own Twig
 templates, and form definitions live in project config, so a form you build locally deploys
 to production.
 
 ```twig
-{{ craft.capture.form('contact') }}
+{{ craft.postOffice.form('contact') }}
 ```
 
 That renders the whole form. If you would rather write the markup yourself, post to the
@@ -26,12 +26,12 @@ This plugin requires [Craft CMS](https://craftcms.com/) 5.5.0 or later, and PHP 
 
 ## Installation
 
-To install the plugin, search for "Capture" in the Craft Plugin Store, or install manually
+To install the plugin, search for "Post Office" in the Craft Plugin Store, or install manually
 using composer.
 
 ```shell
-composer require moca-nz/craft-capture
-php craft plugin/install capture
+composer require moca-nz/craft-post-office
+php craft plugin/install post-office
 ```
 
 ## What you get

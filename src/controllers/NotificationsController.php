@@ -1,10 +1,10 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use craft\web\Controller;
-use moca\capture\elements\Submission;
-use moca\capture\Plugin;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\Plugin;
 use yii\web\Response;
 
 /**
@@ -57,7 +57,7 @@ class NotificationsController extends Controller
             ? Submission::find()->id($submissionIds)->indexBy('id')->all()
             : [];
 
-        return $this->renderTemplate('capture/notifications/_index', [
+        return $this->renderTemplate('post-office/notifications/_index', [
             'rows' => $rows,
             'submissions' => $submissions,
             'page' => $page,

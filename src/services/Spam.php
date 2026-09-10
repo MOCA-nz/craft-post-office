@@ -1,11 +1,11 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
 use Craft;
 use craft\helpers\App;
-use moca\capture\models\Form;
-use moca\capture\Plugin;
+use moca\postoffice\models\Form;
+use moca\postoffice\Plugin;
 use Throwable;
 use yii\base\Component;
 
@@ -25,12 +25,12 @@ class Spam extends Component
     /**
      * The name of the honeypot input rendered into forms.
      */
-    public const HONEYPOT_FIELD = 'capture_hp';
+    public const HONEYPOT_FIELD = 'postoffice_hp';
 
     /**
      * The name of the signed-timestamp input used for the timing check.
      */
-    public const TIMESTAMP_FIELD = 'capture_ts';
+    public const TIMESTAMP_FIELD = 'postoffice_ts';
 
     /**
      * How quickly a form may be submitted, in seconds, before it is treated as automated.

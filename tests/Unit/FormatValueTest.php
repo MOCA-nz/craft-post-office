@@ -1,6 +1,6 @@
 <?php
 
-use moca\capture\models\FormField;
+use moca\postoffice\models\FormField;
 
 /**
  * Pins the "submissions showed raw values" bug: the index and emails rendered `sm, lg` and

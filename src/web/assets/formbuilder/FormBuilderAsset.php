@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\web\assets\formbuilder;
+namespace moca\postoffice\web\assets\formbuilder;
 
 use craft\web\AssetBundle;
 use craft\web\assets\cp\CpAsset;
@@ -24,11 +24,11 @@ class FormBuilderAsset extends AssetBundle
         ];
 
         $this->js = [
-            'capture-formbuilder.js',
+            'post-office-formbuilder.js',
         ];
 
         $this->css = [
-            'capture-formbuilder.css',
+            'post-office-formbuilder.css',
         ];
 
         parent::init();

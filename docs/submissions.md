@@ -41,7 +41,7 @@ index search box finds them.
 
 ## Exporting
 
-The Export button offers Capture's own **Submissions** exporter by default, which writes one
+The Export button offers Post Office's own **Submissions** exporter by default, which writes one
 column per form field plus ID, Form, Date Submitted and IP address. Craft's built-in
 "Raw data" exporter is still offered but writes the values as a single cell of JSON.
 
@@ -66,13 +66,13 @@ elsewhere would invent submissions nobody made.
 The **Site** column is available under View settings, and the index's site menu filters by it
 the way it does for entries.
 
-Counts through `craft.capture.submissionCount()` span every site by default, because "how
+Counts through `craft.postOffice.submissionCount()` span every site by default, because "how
 many enquiries has this form had" is rarely a per-site question. Pass a site ID as the second
 argument to scope it.
 
 ## Permissions
 
-One permission, **View submissions**, under Capture in the user group settings. It gates the
+One permission, **View submissions**, under Post Office in the user group settings. It gates the
 Submissions, Sent Notifications and Logs screens.
 
 The Forms and Settings screens are gated on admin changes instead, because they write to
@@ -81,9 +81,9 @@ project config.
 ## Querying from Twig
 
 ```twig
-{% set form = craft.capture.getForm('contact') %}
+{% set form = craft.postOffice.getForm('contact') %}
 
-{% for submission in craft.capture.submissions({ formId: form.id, limit: 5 }).all() %}
+{% for submission in craft.postOffice.submissions({ formId: form.id, limit: 5 }).all() %}
   {{ submission.values.fullName }}
 {% endfor %}
 ```
@@ -93,7 +93,7 @@ See [templating](templating.md) for the full list.
 ## Querying from PHP
 
 ```php
-use moca\capture\elements\Submission;
+use moca\postoffice\elements\Submission;
 
 $submissions = Submission::find()
     ->formId($form->id)

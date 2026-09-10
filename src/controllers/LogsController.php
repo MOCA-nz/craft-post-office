@@ -1,17 +1,17 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use Craft;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use moca\capture\Plugin;
+use moca\postoffice\Plugin;
 use yii\web\Response;
 
 /**
  * The Logs screen.
  *
- * Capture's own events only: send failures, unreachable captchas, spam rejections. Craft's
+ * Post Office's own events only: send failures, unreachable captchas, spam rejections. Craft's
  * log files are a separate concern and are not surfaced here.
  */
 class LogsController extends Controller
@@ -47,7 +47,7 @@ class LogsController extends Controller
         $query = Plugin::getInstance()->log->getQuery();
         $total = (int)$query->count();
 
-        return $this->renderTemplate('capture/logs/_index', [
+        return $this->renderTemplate('post-office/logs/_index', [
             'rows' => $query->offset(($page - 1) * self::PAGE_SIZE)->limit(self::PAGE_SIZE)->all(),
             'forms' => $forms,
             'page' => $page,
@@ -61,8 +61,8 @@ class LogsController extends Controller
         $this->requirePostRequest();
 
         Plugin::getInstance()->log->clear();
-        $this->setSuccessFlash(Craft::t('capture', 'Log cleared.'));
+        $this->setSuccessFlash(Craft::t('post-office', 'Log cleared.'));
 
-        return $this->redirect(UrlHelper::cpUrl('capture/logs'));
+        return $this->redirect(UrlHelper::cpUrl('post-office/logs'));
     }
 }

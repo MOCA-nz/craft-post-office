@@ -1,62 +1,62 @@
 {% extends '_layouts/cp' %}
 
-{% set title = 'Logs'|t('capture') %}
+{% set title = 'Logs'|t('post-office') %}
 
 {% block actionButton %}
   {% if rows is not empty %}
     <form method="post" accept-charset="UTF-8">
       {{ csrfInput() }}
-      {{ actionInput('capture/logs/clear') }}
-      <button type="submit" class="btn">{{ 'Clear log'|t('capture') }}</button>
+      {{ actionInput('post-office/logs/clear') }}
+      <button type="submit" class="btn">{{ 'Clear log'|t('post-office') }}</button>
     </form>
   {% endif %}
 {% endblock %}
 
-{% set baseUrl = 'capture/logs' %}
+{% set baseUrl = 'post-office/logs' %}
 
 {% block content %}
   {% if total == 0 %}
-    <p class="light">{{ 'Nothing logged yet.'|t('capture') }}</p>
+    <p class="light">{{ 'Nothing logged yet.'|t('post-office') }}</p>
   {% elseif rows is empty %}
-    <p class="light">{{ 'No results on this page.'|t('capture') }}</p>
+    <p class="light">{{ 'No results on this page.'|t('post-office') }}</p>
 
-    {% include 'capture/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
+    {% include 'post-office/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
   {% else %}
     <table class="data fullwidth">
       <thead>
         <tr>
-          <th scope="col">{{ 'When'|t('capture') }}</th>
-          <th scope="col">{{ 'Level'|t('capture') }}</th>
-          <th scope="col">{{ 'Event'|t('capture') }}</th>
-          <th scope="col">{{ 'Message'|t('capture') }}</th>
-          <th scope="col">{{ 'Form'|t('capture') }}</th>
+          <th scope="col">{{ 'When'|t('post-office') }}</th>
+          <th scope="col">{{ 'Level'|t('post-office') }}</th>
+          <th scope="col">{{ 'Event'|t('post-office') }}</th>
+          <th scope="col">{{ 'Message'|t('post-office') }}</th>
+          <th scope="col">{{ 'Form'|t('post-office') }}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
           <tr>
-            <td data-title="{{ 'When'|t('capture') }}">{{ row.dateCreated|datetime('short') }}</td>
-            <td data-title="{{ 'Level'|t('capture') }}">
+            <td data-title="{{ 'When'|t('post-office') }}">{{ row.dateCreated|datetime('short') }}</td>
+            <td data-title="{{ 'Level'|t('post-office') }}">
               <span class="status {{ row.level == 'error' ? 'off' : (row.level == 'warning' ? 'pending' : 'live') }}"></span>
               {{ row.level|title }}
             </td>
-            <td data-title="{{ 'Event'|t('capture') }}"><code>{{ row.event }}</code></td>
-            <td data-title="{{ 'Message'|t('capture') }}">
+            <td data-title="{{ 'Event'|t('post-office') }}"><code>{{ row.event }}</code></td>
+            <td data-title="{{ 'Message'|t('post-office') }}">
               {{ row.message }}
               {%- if row.submissionId %}
-                <a href="{{ url('capture/submissions/' ~ row.submissionId) }}">{{ '(submission)'|t('capture') }}</a>
+                <a href="{{ url('post-office/submissions/' ~ row.submissionId) }}">{{ '(submission)'|t('post-office') }}</a>
               {% endif %}
             </td>
-            <td data-title="{{ 'Form'|t('capture') }}">
+            <td data-title="{{ 'Form'|t('post-office') }}">
               {%- set form = forms[row.formId] ?? null -%}
-              {%- if form %}<a href="{{ url('capture/forms/' ~ form.id) }}">{{ form.name }}</a>{% else %}—{% endif -%}
+              {%- if form %}<a href="{{ url('post-office/forms/' ~ form.id) }}">{{ form.name }}</a>{% else %}—{% endif -%}
             </td>
           </tr>
         {% endfor %}
       </tbody>
     </table>
 
-    {% include 'capture/_pager' with {
+    {% include 'post-office/_pager' with {
       page: page, totalPages: totalPages, total: total, baseUrl: baseUrl,
     } only %}
   {% endif %}

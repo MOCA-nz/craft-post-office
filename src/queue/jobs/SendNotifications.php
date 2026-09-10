@@ -1,11 +1,11 @@
 <?php
 
-namespace moca\capture\queue\jobs;
+namespace moca\postoffice\queue\jobs;
 
 use Craft;
 use craft\queue\BaseJob;
-use moca\capture\elements\Submission;
-use moca\capture\Plugin;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\Plugin;
 
 /**
  * Sends a submission's notifications.
@@ -44,6 +44,6 @@ class SendNotifications extends BaseJob
      */
     protected function defaultDescription(): ?string
     {
-        return Craft::t('capture', 'Sending Capture notifications');
+        return Craft::t('post-office', 'Sending Post Office notifications');
     }
 }

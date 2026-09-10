@@ -1,10 +1,10 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use craft\web\Controller;
-use moca\capture\elements\Submission;
-use moca\capture\Plugin;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\Plugin;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -20,7 +20,7 @@ class SubmissionsController extends Controller
      * The permission this screen is gated on. Referenced by the registration in Plugin, so
      * the handle cannot drift between where it is granted and where it is checked.
      */
-    public const PERMISSION_VIEW_SUBMISSIONS = 'capture:view-submissions';
+    public const PERMISSION_VIEW_SUBMISSIONS = 'post-office:view-submissions';
 
     /**
      * @inheritdoc
@@ -44,7 +44,7 @@ class SubmissionsController extends Controller
      */
     public function actionIndex(): Response
     {
-        return $this->renderTemplate('capture/submissions/_index');
+        return $this->renderTemplate('post-office/submissions/_index');
     }
 
     /**
@@ -60,7 +60,7 @@ class SubmissionsController extends Controller
             throw new NotFoundHttpException('Submission not found');
         }
 
-        return $this->renderTemplate('capture/submissions/_view', [
+        return $this->renderTemplate('post-office/submissions/_view', [
             'submission' => $submission,
             'form' => $submission->getForm(),
             'sent' => Plugin::getInstance()->notifications

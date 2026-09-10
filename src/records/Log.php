@@ -1,9 +1,9 @@
 <?php
 
-namespace moca\capture\records;
+namespace moca\postoffice\records;
 
 use craft\db\ActiveRecord;
-use moca\capture\migrations\Install;
+use moca\postoffice\migrations\Install;
 
 /**
  * @property int $id

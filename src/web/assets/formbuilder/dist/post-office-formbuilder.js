@@ -1,5 +1,5 @@
 /**
- * Capture form builder.
+ * Post Office form builder.
  *
  * Each field row carries its own settings markup, hidden, inside the row itself. Opening a
  * field moves that node into a Garnish modal and moves it back on close. Nothing is
@@ -10,7 +10,7 @@
 (function ($) {
   'use strict';
 
-  Craft.CaptureFormBuilder = Garnish.Base.extend({
+  Craft.PostOfficeFormBuilder = Garnish.Base.extend({
     $container: null,
     $list: null,
     $addBtn: null,
@@ -22,9 +22,9 @@
 
     init: function (container) {
       this.$container = $(container);
-      this.$list = this.$container.find('[data-capture-field-list]');
-      this.$addBtn = this.$container.find('[data-capture-add-field]');
-      this.$prototype = this.$container.find('[data-capture-field-prototype]');
+      this.$list = this.$container.find('[data-post-office-field-list]');
+      this.$addBtn = this.$container.find('[data-post-office-add-field]');
+      this.$prototype = this.$container.find('[data-post-office-field-prototype]');
 
       this.addListener(this.$addBtn, 'activate', 'addField');
 
@@ -32,21 +32,21 @@
       // element it is bound to, so it never arrives from a child row. The row opener is a
       // real <button>, so a click listener also covers Enter and Space for free.
       this.addListener(this.$list, 'click', function (ev) {
-        var $opener = $(ev.target).closest('[data-capture-field-open]');
+        var $opener = $(ev.target).closest('[data-post-office-field-open]');
 
         if (!$opener.length) {
           return;
         }
 
         ev.preventDefault();
-        this.openField($opener.closest('[data-capture-field]'));
+        this.openField($opener.closest('[data-post-office-field]'));
       });
 
       this.initSort();
     },
 
     initSort: function () {
-      this.sorter = new Garnish.DragSort(this.$list.children('[data-capture-field]'), {
+      this.sorter = new Garnish.DragSort(this.$list.children('[data-post-office-field]'), {
         handle: '.move',
         axis: Garnish.Y_AXIS,
         magnetStrength: 4,
@@ -66,7 +66,7 @@
     openField: function ($row) {
       this.$openRow = $row;
 
-      var $settings = $row.find('[data-capture-field-settings]');
+      var $settings = $row.find('[data-post-office-field-settings]');
 
       if (!this.modal) {
         this.buildModal();
@@ -95,8 +95,8 @@
         return;
       }
 
-      var $label = $settings.find('[data-capture-input="label"]');
-      var $handle = $settings.find('[data-capture-input="handle"]');
+      var $label = $settings.find('[data-post-office-input="label"]');
+      var $handle = $settings.find('[data-post-office-input="handle"]');
 
       if (!$label.length || !$handle.length) {
         return;
@@ -107,11 +107,11 @@
 
     buildModal: function () {
       var $modal = $(
-        '<div class="modal capture-field-modal">' +
+        '<div class="modal post-office-field-modal">' +
           '<div class="body"></div>' +
           '<div class="footer">' +
             '<div class="buttons left">' +
-              '<button type="button" class="btn delete" data-capture-delete-field></button>' +
+              '<button type="button" class="btn delete" data-post-office-delete-field></button>' +
             '</div>' +
             '<div class="buttons right">' +
               '<button type="button" class="btn submit"></button>' +
@@ -120,8 +120,8 @@
         '</div>'
       ).appendTo(Garnish.$bod);
 
-      $modal.find('[data-capture-delete-field]').text(Craft.t('capture', 'Delete'));
-      $modal.find('.submit').text(Craft.t('capture', 'Done'));
+      $modal.find('[data-post-office-delete-field]').text(Craft.t('post-office', 'Delete'));
+      $modal.find('.submit').text(Craft.t('post-office', 'Done'));
 
       this.$modalBody = $modal.find('.body');
 
@@ -136,7 +136,7 @@
         this.modal.hide();
       });
 
-      this.addListener($modal.find('[data-capture-delete-field]'), 'activate', 'deleteField');
+      this.addListener($modal.find('[data-post-office-delete-field]'), 'activate', 'deleteField');
     },
 
     closeField: function () {
@@ -144,7 +144,7 @@
         return;
       }
 
-      var $settings = this.$modalBody.children('[data-capture-field-settings]');
+      var $settings = this.$modalBody.children('[data-post-office-field-settings]');
 
       this.$openRow.append($settings.addClass('hidden'));
       this.updateRowSummary(this.$openRow);
@@ -170,18 +170,18 @@
      * Reflects the field's label and type back onto the collapsed row.
      */
     updateRowSummary: function ($row) {
-      var label = $row.find('[data-capture-input="label"]').val() || Craft.t('capture', 'Untitled field');
-      var $type = $row.find('[data-capture-input="type"]');
+      var label = $row.find('[data-post-office-input="label"]').val() || Craft.t('post-office', 'Untitled field');
+      var $type = $row.find('[data-post-office-input="type"]');
       var typeLabel = $type.find('option:selected').text();
-      var handle = $row.find('[data-capture-input="handle"]').val();
+      var handle = $row.find('[data-post-office-input="handle"]').val();
 
-      $row.find('[data-capture-row-label]').text(label);
-      $row.find('[data-capture-row-meta]').text(handle ? typeLabel + ' · ' + handle : typeLabel);
+      $row.find('[data-post-office-row-label]').text(label);
+      $row.find('[data-post-office-row-meta]').text(handle ? typeLabel + ' · ' + handle : typeLabel);
 
       // Craft's lightswitch keeps its value in a hidden input alongside the switch, so
       // match on the name suffix rather than trying to attribute the switch itself.
       var required = $row.find('input[name$="[required]"]').val() === '1';
-      $row.find('[data-capture-row-required]').toggleClass('hidden', !required);
+      $row.find('[data-post-office-row-required]').toggleClass('hidden', !required);
     },
 
     destroy: function () {

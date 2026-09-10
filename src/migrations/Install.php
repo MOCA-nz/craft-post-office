@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\migrations;
+namespace moca\postoffice\migrations;
 
 use craft\db\Migration;
 use craft\db\Query;
@@ -15,12 +15,12 @@ use craft\helpers\Db;
  */
 class Install extends Migration
 {
-    public const TABLE_FORMS = '{{%capture_forms}}';
-    public const TABLE_FORMFIELDS = '{{%capture_formfields}}';
-    public const TABLE_NOTIFICATIONS = '{{%capture_notifications}}';
-    public const TABLE_SUBMISSIONS = '{{%capture_submissions}}';
-    public const TABLE_SENTNOTIFICATIONS = '{{%capture_sentnotifications}}';
-    public const TABLE_LOGS = '{{%capture_logs}}';
+    public const TABLE_FORMS = '{{%postoffice_forms}}';
+    public const TABLE_FORMFIELDS = '{{%postoffice_formfields}}';
+    public const TABLE_NOTIFICATIONS = '{{%postoffice_notifications}}';
+    public const TABLE_SUBMISSIONS = '{{%postoffice_submissions}}';
+    public const TABLE_SENTNOTIFICATIONS = '{{%postoffice_sentnotifications}}';
+    public const TABLE_LOGS = '{{%postoffice_logs}}';
 
     /**
      * @inheritdoc
@@ -44,7 +44,7 @@ class Install extends Migration
     {
         // The elements rows belong to Craft, not to this plugin, so dropping the plugin's
         // tables would strand one row per submission in `elements` forever. Delete them
-        // first, while capture_submissions still exists to identify which they are.
+        // first, while postoffice_submissions still exists to identify which they are.
         if ($this->db->tableExists(self::TABLE_SUBMISSIONS)) {
             $submissionIds = (new Query())
                 ->select(['id'])

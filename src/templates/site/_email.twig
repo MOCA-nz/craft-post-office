@@ -2,7 +2,7 @@
   Default notification email.
 
   Used when a notification has no template of its own. Override by copying to
-  templates/capture/_email.twig, or point the notification at your own template path.
+  templates/post-office/_email.twig, or point the notification at your own template path.
 
   Available: submission, form, values (keyed by handle), rows (label/value pairs for every
   field marked "include in email").
@@ -26,8 +26,8 @@
   </table>
 
   <p style="color:#777;font-size:13px;margin-top:24px">
-    {{ 'Submitted'|t('capture') }} {{ submission.dateCreated|datetime('short') }}
-    {%- if submission.ipAddress %} {{ 'from'|t('capture') }} {{ submission.ipAddress }}{% endif %}
+    {{ 'Submitted'|t('post-office') }} {{ submission.dateCreated|datetime('short') }}
+    {%- if submission.ipAddress %} {{ 'from'|t('post-office') }} {{ submission.ipAddress }}{% endif %}
   </p>
 </body>
 </html>

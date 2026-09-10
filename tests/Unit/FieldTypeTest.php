@@ -1,7 +1,7 @@
 <?php
 
-use moca\capture\fields\FieldType;
-use moca\capture\models\FormField;
+use moca\postoffice\fields\FieldType;
+use moca\postoffice\models\FormField;
 
 it('knows which types carry options', function() {
     expect(FieldType::Select->hasOptions())->toBeTrue()

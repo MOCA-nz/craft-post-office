@@ -1,5 +1,5 @@
 {
-  "name": "moca-nz/craft-capture",
+  "name": "moca-nz/craft-post-office",
   "description": "A contact form builder for Craft CMS. Build forms in the control panel, store submissions as elements, and send notifications from your own Twig templates.",
   "type": "craft-plugin",
   "license": "MIT",
@@ -23,22 +23,22 @@
   },
   "autoload": {
     "psr-4": {
-      "moca\\capture\\": "src/"
+      "moca\\postoffice\\": "src/"
     }
   },
   "support": {
-    "source": "https://github.com/MOCA-nz/craft-capture",
-    "issues": "https://github.com/MOCA-nz/craft-capture/issues",
-    "docs": "https://github.com/MOCA-nz/craft-capture/blob/main/docs/README.md"
+    "source": "https://github.com/MOCA-nz/craft-post-office",
+    "issues": "https://github.com/MOCA-nz/craft-post-office/issues",
+    "docs": "https://github.com/MOCA-nz/craft-post-office/blob/main/docs/README.md"
   },
   "extra": {
-    "name": "Capture",
-    "handle": "capture",
+    "name": "Post Office",
+    "handle": "post-office",
     "developer": "MOCA",
     "developerUrl": "https://www.moca.co.nz/",
-    "documentationUrl": "https://github.com/MOCA-nz/craft-capture/blob/main/docs/README.md",
-    "changelogUrl": "https://raw.githubusercontent.com/MOCA-nz/craft-capture/main/CHANGELOG.md",
-    "class": "moca\\capture\\Plugin"
+    "documentationUrl": "https://github.com/MOCA-nz/craft-post-office/blob/main/docs/README.md",
+    "changelogUrl": "https://raw.githubusercontent.com/MOCA-nz/craft-post-office/main/CHANGELOG.md",
+    "class": "moca\\postoffice\\Plugin"
   },
   "require-dev": {
     "craftcms/ecs": "dev-main",

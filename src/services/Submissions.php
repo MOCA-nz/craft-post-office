@@ -1,10 +1,10 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
 use craft\helpers\Db;
-use moca\capture\elements\Submission;
-use moca\capture\migrations\Install;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\migrations\Install;
 use yii\base\Component;
 
 /**

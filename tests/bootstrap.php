@@ -48,6 +48,6 @@ date_default_timezone_set('UTC');
 // transaction.
 $plugins = Craft::$app->getPlugins();
 
-if (!$plugins->isPluginInstalled('capture')) {
-    $plugins->installPlugin('capture');
+if (!$plugins->isPluginInstalled('post-office')) {
+    $plugins->installPlugin('post-office');
 }

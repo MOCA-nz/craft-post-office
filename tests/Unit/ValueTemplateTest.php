@@ -1,6 +1,6 @@
 <?php
 
-use moca\capture\services\ValueTemplate;
+use moca\postoffice\services\ValueTemplate;
 
 it('recognises what it would act on', function() {
     $t = new ValueTemplate();

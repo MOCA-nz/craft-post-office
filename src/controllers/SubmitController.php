@@ -1,13 +1,13 @@
 <?php
 
-namespace moca\capture\controllers;
+namespace moca\postoffice\controllers;
 
 use Craft;
 use craft\web\Controller;
-use moca\capture\elements\Submission;
-use moca\capture\models\Form;
-use moca\capture\Plugin;
-use moca\capture\services\Log;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\models\Form;
+use moca\postoffice\Plugin;
+use moca\postoffice\services\Log;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -104,7 +104,7 @@ class SubmitController extends Controller
      */
     private function _success(Form $form, Submission $submission): Response
     {
-        $message = $form->successMessage ?: Craft::t('capture', 'Thanks, your message has been sent.');
+        $message = $form->successMessage ?: Craft::t('post-office', 'Thanks, your message has been sent.');
 
         if ($this->request->getAcceptsJson()) {
             return $this->asJson([
@@ -135,17 +135,17 @@ class SubmitController extends Controller
         if ($this->request->getAcceptsJson()) {
             return $this->asJson([
                 'success' => false,
-                'message' => Craft::t('capture', 'Please check the form for errors.'),
+                'message' => Craft::t('post-office', 'Please check the form for errors.'),
                 'errors' => $errors,
             ]);
         }
 
-        Craft::$app->getSession()->setError(Craft::t('capture', 'Please check the form for errors.'));
+        Craft::$app->getSession()->setError(Craft::t('post-office', 'Please check the form for errors.'));
 
         // Hand the submission back so the template can re-render with the values the
         // visitor typed and the errors against each field.
         Craft::$app->getUrlManager()->setRouteParams([
-            'captureSubmission' => $submission,
+            'postOfficeSubmission' => $submission,
         ]);
 
         return null;

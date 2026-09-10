@@ -1,6 +1,6 @@
 <?php
 
-namespace moca\capture\services;
+namespace moca\postoffice\services;
 
 use Craft;
 use craft\db\Query;
@@ -9,13 +9,13 @@ use craft\events\ConfigEvent;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
-use moca\capture\migrations\Install;
-use moca\capture\models\Form;
-use moca\capture\models\FormField;
-use moca\capture\models\Notification;
-use moca\capture\records\Form as FormRecord;
-use moca\capture\records\FormField as FormFieldRecord;
-use moca\capture\records\Notification as NotificationRecord;
+use moca\postoffice\migrations\Install;
+use moca\postoffice\models\Form;
+use moca\postoffice\models\FormField;
+use moca\postoffice\models\Notification;
+use moca\postoffice\records\Form as FormRecord;
+use moca\postoffice\records\FormField as FormFieldRecord;
+use moca\postoffice\records\Notification as NotificationRecord;
 use Throwable;
 use yii\base\Component;
 
@@ -30,7 +30,7 @@ use yii\base\Component;
  */
 class Forms extends Component
 {
-    public const CONFIG_PATH = 'capture.forms';
+    public const CONFIG_PATH = 'post-office.forms';
 
     /**
      * @var Form[]|null Memoized so a request that touches forms repeatedly hits the database once.

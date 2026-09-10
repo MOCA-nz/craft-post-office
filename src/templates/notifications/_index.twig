@@ -1,45 +1,45 @@
 {% extends '_layouts/cp' %}
 
-{% set title = 'Sent Notifications'|t('capture') %}
+{% set title = 'Sent Notifications'|t('post-office') %}
 
-{% set baseUrl = 'capture/sent-notifications' %}
+{% set baseUrl = 'post-office/sent-notifications' %}
 
 {% block content %}
   {% if total == 0 %}
-    <p class="light">{{ 'Nothing has been sent yet.'|t('capture') }}</p>
+    <p class="light">{{ 'Nothing has been sent yet.'|t('post-office') }}</p>
   {% elseif rows is empty %}
-    <p class="light">{{ 'No results on this page.'|t('capture') }}</p>
+    <p class="light">{{ 'No results on this page.'|t('post-office') }}</p>
 
-    {% include 'capture/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
+    {% include 'post-office/_pager' with { page: page, totalPages: totalPages, total: total, baseUrl: baseUrl } only %}
   {% else %}
     <table class="data fullwidth">
       <thead>
         <tr>
-          <th scope="col">{{ 'Date'|t('capture') }}</th>
-          <th scope="col">{{ 'Time'|t('capture') }}</th>
-          <th scope="col">{{ 'Recipient'|t('capture') }}</th>
-          <th scope="col">{{ 'Status'|t('capture') }}</th>
-          <th scope="col">{{ 'Submission'|t('capture') }}</th>
+          <th scope="col">{{ 'Date'|t('post-office') }}</th>
+          <th scope="col">{{ 'Time'|t('post-office') }}</th>
+          <th scope="col">{{ 'Recipient'|t('post-office') }}</th>
+          <th scope="col">{{ 'Status'|t('post-office') }}</th>
+          <th scope="col">{{ 'Submission'|t('post-office') }}</th>
         </tr>
       </thead>
       <tbody>
         {% for row in rows %}
           {% set sent = row.dateCreated|datetime('short') %}
           <tr>
-            <td data-title="{{ 'Date'|t('capture') }}">{{ row.dateCreated|date('short') }}</td>
-            <td data-title="{{ 'Time'|t('capture') }}">{{ row.dateCreated|time('short') }}</td>
-            <td data-title="{{ 'Recipient'|t('capture') }}">{{ row.recipientEmail }}</td>
-            <td data-title="{{ 'Status'|t('capture') }}">
+            <td data-title="{{ 'Date'|t('post-office') }}">{{ row.dateCreated|date('short') }}</td>
+            <td data-title="{{ 'Time'|t('post-office') }}">{{ row.dateCreated|time('short') }}</td>
+            <td data-title="{{ 'Recipient'|t('post-office') }}">{{ row.recipientEmail }}</td>
+            <td data-title="{{ 'Status'|t('post-office') }}">
               <span class="status {{ row.status == 'sent' ? 'live' : 'off' }}"></span>
-              {{ row.status == 'sent' ? 'Sent'|t('capture') : 'Failed'|t('capture') }}
+              {{ row.status == 'sent' ? 'Sent'|t('post-office') : 'Failed'|t('post-office') }}
               {%- if row.error %}<br><span class="error code">{{ row.error }}</span>{% endif %}
             </td>
-            <td data-title="{{ 'Submission'|t('capture') }}">
+            <td data-title="{{ 'Submission'|t('post-office') }}">
               {% set submission = submissions[row.submissionId] ?? null %}
               {% if submission %}
-                <a href="{{ url('capture/submissions/' ~ submission.id) }}">{{ submission.uiLabel }}</a>
+                <a href="{{ url('post-office/submissions/' ~ submission.id) }}">{{ submission.uiLabel }}</a>
               {% else %}
-                <span class="light">{{ 'Deleted'|t('capture') }}</span>
+                <span class="light">{{ 'Deleted'|t('post-office') }}</span>
               {% endif %}
             </td>
           </tr>
@@ -47,7 +47,7 @@
       </tbody>
     </table>
 
-    {% include 'capture/_pager' with {
+    {% include 'post-office/_pager' with {
       page: page, totalPages: totalPages, total: total, baseUrl: baseUrl,
     } only %}
   {% endif %}

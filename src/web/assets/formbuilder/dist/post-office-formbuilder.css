@@ -1,12 +1,12 @@
-/* Capture form builder */
+/* Post Office form builder */
 
-.capture-field-list {
+.post-office-field-list {
   margin: 0 0 14px;
   padding: 0;
   list-style: none;
 }
 
-.capture-field {
+.post-office-field {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -18,16 +18,16 @@
   cursor: pointer;
 }
 
-.capture-field:hover {
+.post-office-field:hover {
   background: var(--gray-050);
 }
 
-.capture-field .move {
+.post-office-field .move {
   cursor: move;
   flex: 0 0 auto;
 }
 
-.capture-field-summary {
+.post-office-field-summary {
   flex: 1 1 auto;
   min-width: 0;
   /* It is a <button> for keyboard access; strip the button chrome. */
@@ -42,40 +42,40 @@
   cursor: pointer;
 }
 
-.capture-field-summary:focus-visible {
+.post-office-field-summary:focus-visible {
   outline: 2px solid var(--focus-ring-color, #127fbf);
   outline-offset: 2px;
 }
 
-.capture-field-label {
+.post-office-field-label {
   font-weight: bold;
   display: block;
 }
 
-.capture-field-meta {
+.post-office-field-meta {
   color: var(--medium-text-color);
   font-size: 12px;
   display: block;
 }
 
-.capture-field-required {
+.post-office-field-required {
   flex: 0 0 auto;
   color: var(--error-color);
   font-weight: bold;
 }
 
-.capture-field-modal {
+.post-office-field-modal {
   width: 520px;
   max-width: calc(100vw - 40px);
 }
 
-.capture-field-modal .body {
+.post-office-field-modal .body {
   padding: 24px;
   max-height: min(70vh, 640px);
   overflow-y: auto;
 }
 
-.capture-empty {
+.post-office-empty {
   padding: 24px;
   text-align: center;
   color: var(--medium-text-color);

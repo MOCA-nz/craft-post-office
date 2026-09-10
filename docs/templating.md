@@ -2,10 +2,10 @@
 
 Two ways to put a form on a page.
 
-## Let Capture render it
+## Let Post Office render it
 
 ```twig
-{{ craft.capture.form('contact') }}
+{{ craft.postOffice.form('contact') }}
 ```
 
 That outputs the whole form: the CSRF token, the action, every field with its label,
@@ -22,12 +22,12 @@ putting a file at the same path in your own `templates/` directory:
 
 | Plugin template | Your override | Renders |
 |---|---|---|
-| `capture/_form` | `templates/capture/_form.twig` | The whole form |
-| `capture/_field` | `templates/capture/_field.twig` | One field |
-| `capture/_email` | `templates/capture/_email.twig` | The default notification email |
+| `post-office/_form` | `templates/post-office/_form.twig` | The whole form |
+| `post-office/_field` | `templates/post-office/_field.twig` | One field |
+| `post-office/_email` | `templates/post-office/_email.twig` | The default notification email |
 
 An override receives everything the original does, so you can restructure freely. Copy the
-plugin's version out of `vendor/moca-nz/craft-capture/src/templates/site/` as a starting
+plugin's version out of `vendor/moca-nz/craft-post-office/src/templates/site/` as a starting
 point.
 
 ## Write the markup yourself
@@ -36,11 +36,11 @@ Post to the plugin's action with the form's handle. Values go under `fields`, ke
 handle.
 
 ```twig
-{% set form = craft.capture.getForm('contact') %}
+{% set form = craft.postOffice.getForm('contact') %}
 
 <form method="post" accept-charset="UTF-8">
   {{ csrfInput() }}
-  {{ actionInput('capture/submit') }}
+  {{ actionInput('post-office/submit') }}
   {{ hiddenInput('formHandle', 'contact') }}
 
   <label for="name">Your name</label>
@@ -63,7 +63,7 @@ storage.
 In redirect mode a failed submission re-renders the page with the submission available:
 
 ```twig
-{% set submission = captureSubmission ?? null %}
+{% set submission = postOfficeSubmission ?? null %}
 {% set errors = submission ? submission.fieldErrors : {} %}
 
 <input type="email" name="fields[email]" value="{{ submission ? submission.values.email }}">
@@ -109,7 +109,7 @@ See [spam protection](spam.md) for why.
 
 ## Exporting
 
-The submissions index has an Export button. Capture adds its own **Submissions** exporter,
+The submissions index has an Export button. Post Office adds its own **Submissions** exporter,
 which is the default and writes one column per form field, plus ID, form, date and IP. Craft's
 built-in "Raw data" exporter is still available but writes the values as a single cell of
 JSON, which is rarely what you want.
@@ -120,20 +120,20 @@ a form has no such field.
 ## Other template variables
 
 ```twig
-{{ craft.capture.getForm('contact') }}      {# one Form, or null #}
-{{ craft.capture.getForms() }}              {# every Form #}
-{{ craft.capture.submissionCount(formId) }} {# across all sites #}
-{{ craft.capture.submissionCount(formId, siteId) }} {# one site #}
-{{ craft.capture.submissions() }}           {# a submission query #}
+{{ craft.postOffice.getForm('contact') }}      {# one Form, or null #}
+{{ craft.postOffice.getForms() }}              {# every Form #}
+{{ craft.postOffice.submissionCount(formId) }} {# across all sites #}
+{{ craft.postOffice.submissionCount(formId, siteId) }} {# one site #}
+{{ craft.postOffice.submissions() }}           {# a submission query #}
 ```
 
-`craft.capture.submissions()` returns an element query, so it takes the usual parameters and
+`craft.postOffice.submissions()` returns an element query, so it takes the usual parameters and
 chains like any other:
 
 ```twig
-{% set form = craft.capture.getForm('contact') %}
+{% set form = craft.postOffice.getForm('contact') %}
 
-{% for submission in craft.capture.submissions({ formId: form.id, limit: 5 }).all() %}
+{% for submission in craft.postOffice.submissions({ formId: form.id, limit: 5 }).all() %}
   {{ submission.values.fullName }} - {{ submission.dateCreated|datetime('short') }}
 {% endfor %}
 ```
