@@ -28,6 +28,12 @@ jobs:
 
       - run: composer phpstan
 
+      # Fails the build when anything in the resolved tree has a published advisory. Usually
+      # that means Craft itself, and usually the fix is on the sites rather than here: the
+      # `^5.5.0` constraint already lets them take the patch. Only narrow it here if a
+      # vulnerable version would otherwise be chosen.
+      - run: composer audit
+
   tests:
     name: Pest on PHP ${{ matrix.php }}
     runs-on: ubuntu-latest
