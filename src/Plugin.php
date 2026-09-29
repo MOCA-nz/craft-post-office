@@ -131,6 +131,22 @@ class Plugin extends BasePlugin
     /**
      * @inheritdoc
      */
+    protected function afterInstall(): void
+    {
+        parent::afterInstall();
+
+        // Not while project config is being applied: the environment the plugin was first
+        // installed in already wrote the sample form to project config, and it arrives with it.
+        if (Craft::$app->getProjectConfig()->getIsApplyingExternalChanges()) {
+            return;
+        }
+
+        $this->forms->createSampleForm();
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function getSettingsResponse(): mixed
     {
         return Craft::$app->getResponse()->redirect(UrlHelper::cpUrl('post-office/settings'));

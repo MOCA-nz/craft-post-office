@@ -43,9 +43,11 @@ completed, because a key is missing or the verification endpoint is unreachable,
 submission is rejected and the reason is logged. A captcha that silently accepts everything
 when misconfigured is worse than one that visibly rejects.
 
-You are responsible for rendering the widget itself in your markup, and for posting the
-`g-recaptcha-response` or `cf-turnstile-response` parameter. Post Office verifies whichever one
-the form has enabled.
+`craft.postOffice.form()` renders the widget (reCAPTCHA v2 checkbox, or Turnstile) and loads
+its script for each captcha the form has enabled. A hand-written form, or an override of
+`_form.twig` that drops that markup, must render it itself and post the
+`g-recaptcha-response` or `cf-turnstile-response` parameter. Post Office verifies whichever
+one the form has enabled.
 
 ## What a rejection looks like
 

@@ -9,6 +9,7 @@ use craft\events\ConfigEvent;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
 use craft\helpers\StringHelper;
+use moca\postoffice\fields\FieldType;
 use moca\postoffice\migrations\Install;
 use moca\postoffice\models\Form;
 use moca\postoffice\models\FormField;
@@ -31,6 +32,11 @@ use yii\base\Component;
 class Forms extends Component
 {
     public const CONFIG_PATH = 'post-office.forms';
+
+    /**
+     * The handle of the form created on install.
+     */
+    public const SAMPLE_FORM_HANDLE = 'sampleForm';
 
     /**
      * @var Form[]|null Memoized so a request that touches forms repeatedly hits the database once.
@@ -253,6 +259,56 @@ class Forms extends Component
         }
 
         return true;
+    }
+
+    /**
+     * Creates the sample form: one field of every type, so a fresh install has something to
+     * render and a reference for how each type behaves.
+     *
+     * Skipped when a form already has the handle, so it never overwrites an editor's changes
+     * or a deleted-and-recreated form of the same name.
+     */
+    public function createSampleForm(): bool
+    {
+        if ($this->getFormByHandle(self::SAMPLE_FORM_HANDLE) !== null) {
+            return false;
+        }
+
+        $options = [
+            ['label' => 'Option one', 'value' => 'one'],
+            ['label' => 'Option two', 'value' => 'two'],
+            ['label' => 'Option three', 'value' => 'three'],
+        ];
+
+        $fields = [
+            ['type' => FieldType::Text->value, 'handle' => 'fullName', 'label' => 'Full name', 'placeholder' => 'Jane Smith', 'required' => true],
+            ['type' => FieldType::Email->value, 'handle' => 'email', 'label' => 'Email', 'placeholder' => 'jane@example.com', 'required' => true],
+            ['type' => FieldType::Tel->value, 'handle' => 'phone', 'label' => 'Phone'],
+            ['type' => FieldType::Number->value, 'handle' => 'quantity', 'label' => 'Quantity'],
+            ['type' => FieldType::Url->value, 'handle' => 'website', 'label' => 'Website', 'placeholder' => 'https://'],
+            ['type' => FieldType::Select->value, 'handle' => 'dropdown', 'label' => 'Dropdown', 'options' => $options],
+            ['type' => FieldType::Radio->value, 'handle' => 'radioButtons', 'label' => 'Radio buttons', 'options' => $options],
+            ['type' => FieldType::Checkboxes->value, 'handle' => 'checkboxes', 'label' => 'Checkboxes', 'options' => $options],
+            ['type' => FieldType::Textarea->value, 'handle' => 'message', 'label' => 'Message', 'required' => true],
+            ['type' => FieldType::Consent->value, 'handle' => 'consent', 'label' => 'I agree to be contacted about my enquiry', 'required' => true],
+            ['type' => FieldType::Hidden->value, 'handle' => 'source', 'label' => 'Source', 'includeInEmail' => false],
+        ];
+
+        $form = new Form([
+            'name' => 'Sample Form',
+            'handle' => self::SAMPLE_FORM_HANDLE,
+            'successBehavior' => Form::SUCCESS_AJAX,
+            'successMessage' => 'Thanks, your message has been sent.',
+        ]);
+
+        $form->setFields(array_map(static function(array $config) {
+            $field = new FormField(array_diff_key($config, ['options' => true]));
+            $field->setOptions($config['options'] ?? []);
+
+            return $field;
+        }, $fields));
+
+        return $this->saveForm($form);
     }
 
     /**

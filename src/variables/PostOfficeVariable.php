@@ -3,6 +3,7 @@
 namespace moca\postoffice\variables;
 
 use Craft;
+use craft\helpers\App;
 use craft\helpers\Template;
 use craft\web\View;
 use moca\postoffice\elements\db\SubmissionQuery;
@@ -103,6 +104,7 @@ class PostOfficeVariable
         }
 
         $view = Craft::$app->getView();
+        $spam = Plugin::getInstance()->spam;
 
         // A failed submission is handed back by SubmitController through route params, so
         // the re-rendered form keeps what the visitor typed and shows the errors.
@@ -115,7 +117,15 @@ class PostOfficeVariable
                 : null,
             'honeypotField' => Spam::HONEYPOT_FIELD,
             'timestampField' => Spam::TIMESTAMP_FIELD,
-            'timestamp' => Plugin::getInstance()->spam->timestampValue(),
+            'timestamp' => $spam->timestampValue(),
+            // Only when Spam::check() will actually verify them, so the widgets and the check
+            // never disagree.
+            'recaptchaSiteKey' => $form->recaptchaEnabled && $spam->isRecaptchaUsable()
+                ? App::parseEnv(Plugin::getInstance()->getSettings()->recaptchaSiteKey)
+                : null,
+            'turnstileSiteKey' => $form->turnstileEnabled && $spam->isTurnstileUsable()
+                ? App::parseEnv(Plugin::getInstance()->getSettings()->turnstileSiteKey)
+                : null,
             'submitText' => (string)($options['submitText'] ?? '') ?: Craft::t('post-office', 'Send'),
             'submitClass' => (string)($options['submitClass'] ?? '') ?: self::DEFAULT_SUBMIT_CLASS,
             'submitId' => (string)($options['submitId'] ?? '') ?: null,

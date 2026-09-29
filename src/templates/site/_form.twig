@@ -152,6 +152,24 @@
     } only %}
   {% endfor %}
 
+  {% if recaptchaSiteKey ?? false %}
+    {# Google's script finds this and adds the g-recaptcha-response input Spam checks. #}
+    <div class="g-recaptcha post-office-field" data-sitekey="{{ recaptchaSiteKey }}"></div>
+    {% do view.registerJsFile('https://www.google.com/recaptcha/api.js', {
+      async: true,
+      defer: true,
+    }) %}
+  {% endif %}
+
+  {% if turnstileSiteKey ?? false %}
+    {# Cloudflare's script finds this and adds the cf-turnstile-response input Spam checks. #}
+    <div class="cf-turnstile post-office-field" data-sitekey="{{ turnstileSiteKey }}"></div>
+    {% do view.registerJsFile('https://challenges.cloudflare.com/turnstile/v0/api.js', {
+      async: true,
+      defer: true,
+    }) %}
+  {% endif %}
+
   {# Label, class and id come from craft.postOffice.form()'s options. A class passed there
      replaces this one, which is also what takes the button out of the styles above. #}
   <button type="submit"
@@ -218,7 +236,17 @@
             message.className = 'post-office-message post-office-message--error';
             message.textContent = '{{ 'Something went wrong. Please try again.'|t('post-office') }}';
           })
-          .finally(function () { button.disabled = false; });
+          .finally(function () {
+            button.disabled = false;
+            // Captcha tokens are good for one verification, so the next attempt needs new ones.
+            // reCAPTCHA identifies auto-rendered widgets by their order on the page.
+            var recaptchaWidget = form.querySelector('.g-recaptcha');
+            if (recaptchaWidget && window.grecaptcha) {
+              window.grecaptcha.reset(Array.prototype.indexOf.call(document.querySelectorAll('.g-recaptcha'), recaptchaWidget));
+            }
+            var turnstileWidget = form.querySelector('.cf-turnstile');
+            if (turnstileWidget && window.turnstile) window.turnstile.reset(turnstileWidget);
+          });
       });
     })();
   {% endjs %}
