@@ -5,9 +5,15 @@ namespace moca\postoffice\models;
 use Craft;
 use craft\base\Model;
 use craft\behaviors\EnvAttributeParserBehavior;
+use craft\helpers\Template;
 use craft\validators\HandleValidator;
 use craft\validators\UniqueValidator;
+use craft\web\View;
+use moca\postoffice\elements\Submission;
+use moca\postoffice\Plugin;
 use moca\postoffice\records\Form as FormRecord;
+use Throwable;
+use Twig\Markup;
 
 /**
  * A form definition.
@@ -44,6 +50,11 @@ class Form extends Model
      * @var Notification[]
      */
     private array $_notifications = [];
+
+    /**
+     * @var Submission|null The submission currently being rendered into a notification.
+     */
+    private ?Submission $_renderingSubmission = null;
 
     /**
      * @inheritdoc
@@ -88,6 +99,49 @@ class Form extends Model
     public function setNotifications(array $notifications): void
     {
         $this->_notifications = $notifications;
+    }
+
+    /**
+     * Renders a submission as the plugin's standard table of label/value rows.
+     *
+     * This is the default notification body, so a custom email template can lay out its own
+     * branding around `{{ form.submissionMarkup() }}` and still get the same table every
+     * other notification uses. Also works on a thank-you page, where the submission has to be
+     * passed in.
+     *
+     * The submission is optional inside a notification template only: the plugin sets it on
+     * the form before rendering. Everywhere else, pass it.
+     *
+     * @throws Throwable if the template fails to render.
+     */
+    public function submissionMarkup(?Submission $submission = null): Markup
+    {
+        $submission ??= $this->_renderingSubmission;
+
+        if ($submission === null) {
+            return Template::raw('');
+        }
+
+        $html = Craft::$app->getView()->renderTemplate(
+            'post-office/_submission-table',
+            [
+                'form' => $this,
+                'submission' => $submission,
+                'rows' => Plugin::getInstance()->notifications->emailRows($submission, $this),
+            ],
+            View::TEMPLATE_MODE_SITE,
+        );
+
+        return Template::raw($html);
+    }
+
+    /**
+     * Tells the form which submission is being rendered, so a notification template can call
+     * submissionMarkup() without arguments.
+     */
+    public function setRenderingSubmission(?Submission $submission): void
+    {
+        $this->_renderingSubmission = $submission;
     }
 
     /**

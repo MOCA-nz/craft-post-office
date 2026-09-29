@@ -1,0 +1,27 @@
+{#
+  The submission, as a table.
+
+  This is the default notification body, and what `form.submissionMarkup()` renders, so an
+  override changes both at once. Copy it to templates/post-office/_submission-table.twig to
+  change it for a project.
+
+  Available: submission, form, rows (label/value pairs for every field marked "include in
+  email").
+#}
+<table cellpadding="0" cellspacing="0" style="border-collapse:collapse;width:100%;max-width:600px">
+  {% for row in rows %}
+    <tr>
+      <th align="left" valign="top" style="padding:8px 16px 8px 0;border-bottom:1px solid #eee;width:35%">
+        {{ row.label }}
+      </th>
+      <td valign="top" style="padding:8px 0;border-bottom:1px solid #eee">
+        {{ row.value is empty ? '—' : row.value|nl2br }}
+      </td>
+    </tr>
+  {% endfor %}
+</table>
+
+<p style="color:#777;font-size:13px;margin-top:24px">
+  {{ 'Submitted'|t('post-office') }} {{ submission.dateCreated|datetime('short') }}
+  {%- if submission.ipAddress %} {{ 'from'|t('post-office') }} {{ submission.ipAddress }}{% endif %}
+</p>

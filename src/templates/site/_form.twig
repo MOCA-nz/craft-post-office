@@ -4,6 +4,119 @@
   Override by copying this file to templates/post-office/_form.twig in your project. Everything
   it relies on is passed in, so an override can restructure the markup freely.
 #}
+{% css %}
+  /* Enough styling that a form is usable and tidy the moment it renders: labels above their
+     inputs, one column, consistent spacing. Deliberately plain, and low specificity, so a
+     project's own stylesheet overrides any of it without fighting. Remove this block in an
+     override of this template to start from nothing. */
+  .post-office-form {
+    --post-office-gap: 6px;
+  }
+
+  .post-office-form .post-office-field {
+    margin: 0 0 var(--post-office-gap);
+  }
+
+  .post-office-form label {
+    display: block;
+    margin-bottom: var(--post-office-gap);
+  }
+
+  .post-office-form input,
+  .post-office-form select,
+  .post-office-form textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--post-office-gap);
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    font: inherit;
+    color: inherit;
+  }
+
+  .post-office-form textarea {
+    resize: vertical;
+  }
+
+  .post-office-form input:focus,
+  .post-office-form select:focus,
+  .post-office-form textarea:focus {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+  }
+
+  /* Tick boxes read the other way round: the box, then its own label beside it. */
+  .post-office-form .post-office-options label,
+  .post-office-form .post-office-consent {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--post-office-gap);
+  }
+
+  .post-office-form .post-office-options label input,
+  .post-office-form .post-office-consent input {
+    width: auto;
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 0;
+  }
+
+  .post-office-form .post-office-required {
+    color: #c00;
+  }
+
+  .post-office-form .post-office-error {
+    margin: var(--post-office-gap) 0 0;
+    color: #c00;
+    font-size: 0.875em;
+  }
+
+  .post-office-form .post-office-field--error input,
+  .post-office-form .post-office-field--error select,
+  .post-office-form .post-office-field--error textarea {
+    border-color: #c00;
+  }
+
+  .post-office-form .post-office-message {
+    margin: 0 0 var(--post-office-gap);
+    padding: var(--post-office-gap);
+    border-radius: 4px;
+  }
+
+  .post-office-form .post-office-message--success {
+    background: #e6f4ea;
+    color: #137333;
+  }
+
+  .post-office-form .post-office-message--error {
+    background: #fce8e6;
+    color: #c5221f;
+  }
+
+  .post-office-form .post-office-submit {
+    margin-top: var(--post-office-gap);
+    padding: calc(var(--post-office-gap) * 1.5) calc(var(--post-office-gap) * 3);
+    border: 0;
+    border-radius: 4px;
+    background: #222;
+    color: #fff;
+    font: inherit;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .post-office-form .post-office-submit:hover {
+    background: #444;
+  }
+
+  .post-office-form .post-office-submit[disabled] {
+    opacity: 0.6;
+    cursor: default;
+  }
+{% endcss %}
+
 {% set submission = postOfficeSubmission ?? null %}
 {% set values = submission ? submission.values : {} %}
 {% set errors = submission ? submission.fieldErrors : {} %}
@@ -39,7 +152,13 @@
     } only %}
   {% endfor %}
 
-  <button type="submit" class="post-office-submit">{{ 'Send'|t('post-office') }}</button>
+  {# Label, class and id come from craft.postOffice.form()'s options. A class passed there
+     replaces this one, which is also what takes the button out of the styles above. #}
+  <button type="submit"
+          class="{{ submitClass ?? 'post-office-submit' }}"
+          {% if submitId ?? false %}id="{{ submitId }}"{% endif %}>
+    {{- submitText ?? 'Send'|t('post-office') -}}
+  </button>
 </form>
 
 {% if isAjax %}

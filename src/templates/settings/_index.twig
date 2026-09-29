@@ -30,41 +30,63 @@
 
   <h2>{{ 'reCAPTCHA'|t('post-office') }}</h2>
 
-  {{ forms.autosuggestField({
-    label: 'Site key'|t('post-office'),
-    name: 'recaptchaSiteKey',
-    value: settings.recaptchaSiteKey,
-    suggestEnvVars: true,
+  {{ forms.lightswitchField({
+    label: 'Use reCAPTCHA'|t('post-office'),
+    instructions: 'Off means no form can turn it on.'|t('post-office'),
+    name: 'recaptchaEnabled',
+    on: settings.recaptchaEnabled,
     disabled: readOnly,
+    toggle: 'recaptcha-keys',
   }) }}
 
-  {{ forms.autosuggestField({
-    label: 'Secret key'|t('post-office'),
-    name: 'recaptchaSecretKey',
-    value: settings.recaptchaSecretKey,
-    suggestEnvVars: true,
-    disabled: readOnly,
-  }) }}
+  <div id="recaptcha-keys" class="{{ not settings.recaptchaEnabled ? 'hidden' }}">
+    {{ forms.autosuggestField({
+      label: 'Site key'|t('post-office'),
+      name: 'recaptchaSiteKey',
+      value: settings.recaptchaSiteKey,
+      suggestEnvVars: true,
+      disabled: readOnly,
+    }) }}
+
+    {{ forms.autosuggestField({
+      label: 'Secret key'|t('post-office'),
+      name: 'recaptchaSecretKey',
+      value: settings.recaptchaSecretKey,
+      suggestEnvVars: true,
+      disabled: readOnly,
+    }) }}
+  </div>
 
   <hr>
 
   <h2>{{ 'Turnstile'|t('post-office') }}</h2>
 
-  {{ forms.autosuggestField({
-    label: 'Site key'|t('post-office'),
-    name: 'turnstileSiteKey',
-    value: settings.turnstileSiteKey,
-    suggestEnvVars: true,
+  {{ forms.lightswitchField({
+    label: 'Use Turnstile'|t('post-office'),
+    instructions: 'Off means no form can turn it on.'|t('post-office'),
+    name: 'turnstileEnabled',
+    on: settings.turnstileEnabled,
     disabled: readOnly,
+    toggle: 'turnstile-keys',
   }) }}
 
-  {{ forms.autosuggestField({
-    label: 'Secret key'|t('post-office'),
-    name: 'turnstileSecretKey',
-    value: settings.turnstileSecretKey,
-    suggestEnvVars: true,
-    disabled: readOnly,
-  }) }}
+  <div id="turnstile-keys" class="{{ not settings.turnstileEnabled ? 'hidden' }}">
+    {{ forms.autosuggestField({
+      label: 'Site key'|t('post-office'),
+      name: 'turnstileSiteKey',
+      value: settings.turnstileSiteKey,
+      suggestEnvVars: true,
+      disabled: readOnly,
+    }) }}
+
+    {{ forms.autosuggestField({
+      label: 'Secret key'|t('post-office'),
+      name: 'turnstileSecretKey',
+      value: settings.turnstileSecretKey,
+      suggestEnvVars: true,
+      disabled: readOnly,
+    }) }}
+  </div>
 
   {% if readOnly %}
     <p class="warning">

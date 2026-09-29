@@ -62,11 +62,11 @@ class Spam extends Component
             return false;
         }
 
-        if ($form->recaptchaEnabled && !$this->_checkRecaptcha()) {
+        if ($form->recaptchaEnabled && $this->isRecaptchaUsable() && !$this->_checkRecaptcha()) {
             return false;
         }
 
-        if ($form->turnstileEnabled && !$this->_checkTurnstile()) {
+        if ($form->turnstileEnabled && $this->isTurnstileUsable() && !$this->_checkTurnstile()) {
             return false;
         }
 
@@ -74,7 +74,27 @@ class Spam extends Component
     }
 
     /**
-     * Whether reCAPTCHA is usable: both keys are present.
+     * Whether reCAPTCHA may be used: switched on plugin-wide, and configured.
+     *
+     * A form's own switch is only consulted on top of this. Turning reCAPTCHA off in the
+     * plugin settings must not start rejecting submissions against keys that are no longer
+     * there, and a form that had it on keeps that setting for when it is switched back on.
+     */
+    public function isRecaptchaUsable(): bool
+    {
+        return Plugin::getInstance()->getSettings()->recaptchaEnabled && $this->hasRecaptchaKeys();
+    }
+
+    /**
+     * Whether Turnstile may be used: switched on plugin-wide, and configured.
+     */
+    public function isTurnstileUsable(): bool
+    {
+        return Plugin::getInstance()->getSettings()->turnstileEnabled && $this->hasTurnstileKeys();
+    }
+
+    /**
+     * Whether reCAPTCHA's keys are both present.
      */
     public function hasRecaptchaKeys(): bool
     {
@@ -85,7 +105,7 @@ class Spam extends Component
     }
 
     /**
-     * Whether Turnstile is usable: both keys are present.
+     * Whether Turnstile's keys are both present.
      */
     public function hasTurnstileKeys(): bool
     {

@@ -53,6 +53,8 @@ class SettingsController extends Controller
         // Load the model first and update properties, rather than passing the body params
         // straight to savePluginSettings(): only submitted keys would persist and anything
         // else on the model would be silently dropped.
+        $settings->recaptchaEnabled = (bool)$this->request->getBodyParam('recaptchaEnabled');
+        $settings->turnstileEnabled = (bool)$this->request->getBodyParam('turnstileEnabled');
         $settings->recaptchaSiteKey = (string)$this->request->getBodyParam('recaptchaSiteKey', '');
         $settings->recaptchaSecretKey = (string)$this->request->getBodyParam('recaptchaSecretKey', '');
         $settings->turnstileSiteKey = (string)$this->request->getBodyParam('turnstileSiteKey', '');

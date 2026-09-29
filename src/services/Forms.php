@@ -357,6 +357,16 @@ class Forms extends Component
      */
     private function _applyFields(int $formId, array $fields): void
     {
+        // Anything no longer in config has been deleted from the form. This runs before the
+        // writes, not after: handles are unique per form, so a field that takes over the
+        // handle of one being removed would otherwise collide with a row that is already on
+        // its way out. Deleting a field and adding another with the same handle is one save.
+        Db::delete(Install::TABLE_FORMFIELDS, [
+            'and',
+            ['formId' => $formId],
+            ['not', ['uid' => array_keys($fields)]],
+        ]);
+
         foreach ($fields as $uid => $data) {
             $record = FormFieldRecord::findOne(['uid' => $uid]) ?? new FormFieldRecord();
             $record->uid = $uid;

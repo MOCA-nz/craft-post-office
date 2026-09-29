@@ -18,6 +18,12 @@ use Twig\Markup;
 class PostOfficeVariable
 {
     /**
+     * The submit button's class when the template doesn't ask for another one. The plugin's
+     * default styles hang off this, so replacing it also opts out of them.
+     */
+    public const DEFAULT_SUBMIT_CLASS = 'post-office-submit';
+
+    /**
      * Returns a form definition by handle.
      */
     public function getForm(string $handle): ?Form
@@ -72,8 +78,23 @@ class PostOfficeVariable
      *
      * Returns null rather than throwing when the handle is unknown, so a mistyped handle in
      * a template does not take the page down.
+     *
+     * The submit button is the one part of the markup a project usually needs to change
+     * without overriding the whole template, so it takes its label, class and id from here:
+     *
+     *     {{ craft.postOffice.form('contact', {
+     *         submitText: 'Send enquiry',
+     *         submitClass: 'btn btn--primary',
+     *         submitId: 'enquiry-submit',
+     *     }) }}
+     *
+     * A class given here replaces the default rather than joining it, which also takes the
+     * button out of the plugin's own styles: they are written against the default class, so
+     * nothing has to be un-styled.
+     *
+     * @param array{submitText?: string, submitClass?: string, submitId?: string} $options
      */
-    public function form(string $handle): ?Markup
+    public function form(string $handle, array $options = []): ?Markup
     {
         $form = $this->getForm($handle);
 
@@ -95,6 +116,9 @@ class PostOfficeVariable
             'honeypotField' => Spam::HONEYPOT_FIELD,
             'timestampField' => Spam::TIMESTAMP_FIELD,
             'timestamp' => Plugin::getInstance()->spam->timestampValue(),
+            'submitText' => (string)($options['submitText'] ?? '') ?: Craft::t('post-office', 'Send'),
+            'submitClass' => (string)($options['submitClass'] ?? '') ?: self::DEFAULT_SUBMIT_CLASS,
+            'submitId' => (string)($options['submitId'] ?? '') ?: null,
         ], View::TEMPLATE_MODE_SITE);
 
         return Template::raw($html);

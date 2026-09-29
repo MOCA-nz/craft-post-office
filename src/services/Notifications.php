@@ -109,11 +109,50 @@ class Notifications extends Component
             'submission' => $submission,
             'form' => $form,
             'values' => $submission->getValues(),
-            'rows' => $this->_emailRows($submission, $form),
+            'rows' => $this->emailRows($submission, $form),
         ];
 
-        return $view->renderTemplate($template, $variables, View::TEMPLATE_MODE_SITE);
+        // So a template can call form.submittionMarkup() with no argument. Cleared again
+        // afterwards: forms are memoized, and a stale submission on a shared instance would
+        // render one submission's values into another's email.
+        $form->setRenderingSubmission($submission);
+
+        try {
+            return $view->renderTemplate($template, $variables, View::TEMPLATE_MODE_SITE);
+        } finally {
+            $form->setRenderingSubmission(null);
+        }
     }
+
+    /**
+     * The label/value pairs the default email template renders.
+     *
+     * Honours each field's "include in email" switch, which is the only place that setting
+     * has any effect.
+     */
+    public function emailRows(Submission $submission, Form $form): array
+    {
+        $values = $submission->getValues();
+        $rows = [];
+
+        foreach ($form->getFields() as $field) {
+            if (!$field->includeInEmail) {
+                continue;
+            }
+
+            $value = $values[$field->handle] ?? null;
+
+            $rows[] = [
+                'label' => $field->label,
+                'value' => $field->formatValue($value),
+            ];
+        }
+
+        return $rows;
+    }
+
+    // Private
+    // =========================================================================
 
     /**
      * Resolves who a notification goes to.
@@ -286,33 +325,6 @@ class Notifications extends Component
         $value = $submission->getValues()[$emailField->handle] ?? null;
 
         return is_string($value) && $value !== '' ? $value : null;
-    }
-
-    /**
-     * The label/value pairs the default email template renders.
-     *
-     * Honours each field's "include in email" switch, which is the only place that setting
-     * has any effect.
-     */
-    private function _emailRows(Submission $submission, Form $form): array
-    {
-        $values = $submission->getValues();
-        $rows = [];
-
-        foreach ($form->getFields() as $field) {
-            if (!$field->includeInEmail) {
-                continue;
-            }
-
-            $value = $values[$field->handle] ?? null;
-
-            $rows[] = [
-                'label' => $field->label,
-                'value' => $field->formatValue($value),
-            ];
-        }
-
-        return $rows;
     }
 
     private function _record(

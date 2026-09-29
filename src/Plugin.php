@@ -119,6 +119,10 @@ class Plugin extends BasePlugin
                 'label' => Craft::t('post-office', 'Logs'),
                 'url' => 'post-office/logs',
             ],
+            'settings' => [
+                'label' => Craft::t('post-office', 'Settings'),
+                'url' => 'post-office/settings',
+            ],
         ];
 
         return $item;

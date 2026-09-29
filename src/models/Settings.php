@@ -17,6 +17,19 @@ use craft\base\Model;
 class Settings extends Model
 {
     /**
+     * @var bool Whether reCAPTCHA is offered at all.
+     *
+     * Off means the keys are not asked for here, and no form may turn it on: a protection
+     * nobody configured has no business appearing as a choice on every form.
+     */
+    public bool $recaptchaEnabled = false;
+
+    /**
+     * @var bool Whether Turnstile is offered at all.
+     */
+    public bool $turnstileEnabled = false;
+
+    /**
      * @var string reCAPTCHA site key, or an env variable reference.
      */
     public string $recaptchaSiteKey = '';
@@ -51,6 +64,7 @@ class Settings extends Model
     protected function defineRules(): array
     {
         return array_merge(parent::defineRules(), [
+            [['recaptchaEnabled', 'turnstileEnabled'], 'boolean'],
             [
                 [
                     'recaptchaSiteKey',

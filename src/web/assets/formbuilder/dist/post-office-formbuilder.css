@@ -64,15 +64,63 @@
   font-weight: bold;
 }
 
+/* Garnish measures the modal's content and then sets its height in pixels, so the footer has
+   to be part of that measurement, and the body has to be what gives way when the modal is
+   capped to the window height. A column flexbox does both: the footer keeps its own height,
+   the body takes the rest and scrolls. */
 .post-office-field-modal {
   width: 520px;
   max-width: calc(100vw - 40px);
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
 }
 
 .post-office-field-modal .body {
+  flex: 1 1 auto;
+  /* Without this the body refuses to shrink below its content, and pushes the footer out. */
+  min-height: 0;
   padding: 24px;
-  max-height: min(70vh, 640px);
   overflow-y: auto;
+}
+
+/* Craft positions modal footers absolutely. In a flex column that takes it out of the
+   measurement and leaves it sitting under the modal. */
+.post-office-field-modal .footer {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.post-office-field-modal-close {
+  position: absolute;
+  top: 10px;
+  inset-inline-end: 10px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  appearance: none;
+  /* Opaque: the body scrolls underneath it. */
+  background: var(--modal-bg, var(--white));
+  border: 0;
+  border-radius: var(--small-border-radius);
+  color: var(--medium-text-color);
+  cursor: pointer;
+}
+
+.post-office-field-modal-close:hover {
+  color: var(--text-color);
+  background: var(--gray-100);
+}
+
+.post-office-field-modal-close:focus-visible {
+  outline: 2px solid var(--focus-ring-color, #127fbf);
+  outline-offset: 1px;
+}
+
+/* The first field in the body sits under the close button otherwise. */
+.post-office-field-modal .body > :first-child > .field:first-child {
+  padding-inline-end: 28px;
 }
 
 .post-office-empty {

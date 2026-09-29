@@ -67,10 +67,14 @@ class FormsController extends Controller
             }
         }
 
+        $spam = Plugin::getInstance()->spam;
+
         return $this->renderTemplate('post-office/forms/_edit', [
             'form' => $form,
             'isNew' => $form->id === null,
             'fieldTypes' => $this->_fieldTypeOptions(),
+            'recaptchaUsable' => $spam->isRecaptchaUsable(),
+            'turnstileUsable' => $spam->isTurnstileUsable(),
             'title' => $form->id === null
                 ? Craft::t('post-office', 'Create a new form')
                 : $form->name,
@@ -108,8 +112,20 @@ class FormsController extends Controller
         // setSuccessFlash() reads through getValidatedBodyParam() and expects to be hashed.
         $form->successMessage = $request->getBodyParam('formSuccessMessage') ?: null;
         $form->honeypotEnabled = (bool)$request->getBodyParam('honeypotEnabled');
-        $form->recaptchaEnabled = (bool)$request->getBodyParam('recaptchaEnabled');
-        $form->turnstileEnabled = (bool)$request->getBodyParam('turnstileEnabled');
+
+        // The captcha switches are only rendered when that captcha is switched on and
+        // configured plugin-wide, so an absent param means "not offered", not "turned off".
+        // Reading it blindly would quietly clear the form's setting the first time it was
+        // saved while the captcha was unavailable.
+        $spam = Plugin::getInstance()->spam;
+
+        if ($spam->isRecaptchaUsable()) {
+            $form->recaptchaEnabled = (bool)$request->getBodyParam('recaptchaEnabled');
+        }
+
+        if ($spam->isTurnstileUsable()) {
+            $form->turnstileEnabled = (bool)$request->getBodyParam('turnstileEnabled');
+        }
 
         $form->setFields($this->_fieldsFromPost());
         $form->setNotifications($this->_notificationsFromPost($form));

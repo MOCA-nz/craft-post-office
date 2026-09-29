@@ -106,7 +106,11 @@
 
       <ul class="post-office-field-list" data-post-office-field-list>
         {% for field in form.fields %}
-          <li class="post-office-field" data-post-office-field>
+          {# A field that has never been saved has no UID yet. It still needs a key of its
+             own: `fields[][label]` and `fields[][handle]` are two separate rows to PHP, so an
+             empty key splits every field in half on the next save. #}
+          {% set rowKey = field.uid ?? 'new' ~ loop.index %}
+          <li class="post-office-field" data-post-office-field{{ field.uid is null ? ' data-post-office-new' : '' }}>
             <a class="move icon" title="{{ 'Reorder'|t('post-office') }}"></a>
             <button type="button" class="post-office-field-summary" data-post-office-field-open>
               <span class="post-office-field-label" data-post-office-row-label>{{ field.label }}</span>
@@ -115,7 +119,7 @@
               </span>
             </button>
             <span class="post-office-field-required {{ not field.required ? 'hidden' }}" data-post-office-row-required>*</span>
-            {{ builder.fieldSettings(field.uid, field, fieldTypes) }}
+            {{ builder.fieldSettings(rowKey, field, fieldTypes) }}
           </li>
         {% endfor %}
       </ul>
@@ -125,7 +129,7 @@
       </button>
 
       <script type="text/template" data-post-office-field-prototype>
-        <li class="post-office-field" data-post-office-field>
+        <li class="post-office-field" data-post-office-field data-post-office-new>
           <a class="move icon" title="{{ 'Reorder'|t('post-office') }}"></a>
           <button type="button" class="post-office-field-summary" data-post-office-field-open>
             <span class="post-office-field-label" data-post-office-row-label>{{ 'Untitled field'|t('post-office') }}</span>
@@ -139,8 +143,11 @@
   </div>
 
   <div id="settings" class="hidden">
+    {# Explicit IDs: Craft generates a random one per field otherwise, and the handle
+       generator below needs to be able to find these two. #}
     {{ forms.textField({
       first: true,
+      id: 'form-name',
       label: 'Name'|t('post-office'),
       name: 'name',
       value: form.name,
@@ -149,6 +156,7 @@
     }) }}
 
     {{ forms.textField({
+      id: 'form-handle',
       label: 'Handle'|t('post-office'),
       name: 'handle',
       value: form.handle,
@@ -281,22 +289,38 @@
       on: form.honeypotEnabled,
     }) }}
 
-    {{ forms.lightswitchField({
-      label: 'reCAPTCHA'|t('post-office'),
-      instructions: 'Requires keys in the plugin settings.'|t('post-office'),
-      name: 'recaptchaEnabled',
-      on: form.recaptchaEnabled,
-    }) }}
+    {# Only offered once it is switched on and configured plugin-wide. A form that already
+       has one turned on keeps that setting: the switch is hidden, not posted, and the save
+       leaves the stored value alone. #}
+    {% if recaptchaUsable %}
+      {{ forms.lightswitchField({
+        label: 'reCAPTCHA'|t('post-office'),
+        name: 'recaptchaEnabled',
+        on: form.recaptchaEnabled,
+      }) }}
+    {% endif %}
 
-    {{ forms.lightswitchField({
-      label: 'Turnstile'|t('post-office'),
-      instructions: 'Requires keys in the plugin settings.'|t('post-office'),
-      name: 'turnstileEnabled',
-      on: form.turnstileEnabled,
-    }) }}
+    {% if turnstileUsable %}
+      {{ forms.lightswitchField({
+        label: 'Turnstile'|t('post-office'),
+        name: 'turnstileEnabled',
+        on: form.turnstileEnabled,
+      }) }}
+    {% endif %}
+
+    {% if not recaptchaUsable and not turnstileUsable %}
+      <p class="light">
+        {{ 'reCAPTCHA and Turnstile are switched off for this site. Turn one on in the plugin settings to offer it here.'|t('post-office') }}
+      </p>
+    {% endif %}
   </div>
 {% endblock %}
 
 {% js %}
   new Craft.PostOfficeFormBuilder($('[data-post-office-builder]'));
+
+  // Derive the form's handle from its name, the way the fields do, and the way every other
+  // Craft screen does. The generator stops as soon as the handle is edited by hand, and
+  // never touches a handle that already has a value, so an existing form is safe.
+  new Craft.HandleGenerator('#form-name', '#form-handle');
 {% endjs %}

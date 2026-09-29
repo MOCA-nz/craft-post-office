@@ -20,6 +20,19 @@
     $openRow: null,
     rowCounter: 0,
 
+    /**
+     * Set by saveField() only. Every other way out of the modal (the close button, ESC, a
+     * click on the shade) leaves it false, so hiding the modal cancels by default.
+     */
+    committing: false,
+
+    /**
+     * The open row's input values as they were when the modal opened, so a cancel can put
+     * them back. The inputs live in the page's form, so editing them is immediate: there is
+     * nothing to "not save" unless the previous values are kept.
+     */
+    restorePoint: null,
+
     init: function (container) {
       this.$container = $(container);
       this.$list = this.$container.find('[data-post-office-field-list]');
@@ -59,6 +72,11 @@
       var html = this.$prototype.html().replace(/__ROW__/g, rowId);
       var $row = $(html).appendTo(this.$list);
 
+      // The row came out of a <script> template, so none of Craft's own widgets in it are
+      // alive yet. Without this the lightswitches are inert markup: clicking Required does
+      // nothing, and its hidden input never changes, until the page is reloaded from a save.
+      Craft.initUiElements($row);
+
       this.sorter.addItems($row);
       this.openField($row);
     },
@@ -72,6 +90,8 @@
         this.buildModal();
       }
 
+      this.restorePoint = this.takeRestorePoint($settings);
+
       // Move the row's own settings node into the modal. It goes back on close, so the
       // inputs never leave the form and never need re-syncing.
       this.$modalBody.empty().append($settings.removeClass('hidden'));
@@ -81,6 +101,54 @@
       this.initHandleGenerator($settings);
 
       Garnish.setFocusWithin(this.$modalBody);
+    },
+
+    /**
+     * Records the current value of every input in the field's settings.
+     *
+     * Lightswitches are recorded through their own widget rather than their hidden input,
+     * because putting the input's value back would leave the switch itself showing the
+     * opposite state.
+     */
+    takeRestorePoint: function ($settings) {
+      var values = [];
+      var switches = [];
+
+      $settings.find('input, select, textarea').each(function () {
+        values.push({el: this, value: $(this).val()});
+      });
+
+      $settings.find('.lightswitch').each(function () {
+        var lightswitch = $(this).data('lightswitch');
+
+        if (lightswitch) {
+          switches.push({lightswitch: lightswitch, on: lightswitch.on});
+        }
+      });
+
+      return {values: values, switches: switches};
+    },
+
+    /**
+     * Puts the recorded values back, undoing whatever was typed while the modal was open.
+     */
+    applyRestorePoint: function (restorePoint) {
+      if (!restorePoint) {
+        return;
+      }
+
+      restorePoint.values.forEach(function (entry) {
+        $(entry.el).val(entry.value);
+      });
+
+      // After the raw values, so each switch rewrites its own hidden input last.
+      restorePoint.switches.forEach(function (entry) {
+        if (entry.on) {
+          entry.lightswitch.turnOn(true);
+        } else {
+          entry.lightswitch.turnOff(true);
+        }
+      });
     },
 
     /**
@@ -108,20 +176,22 @@
     buildModal: function () {
       var $modal = $(
         '<div class="modal post-office-field-modal">' +
+          '<button type="button" class="post-office-field-modal-close" data-icon="remove" data-post-office-close-field></button>' +
           '<div class="body"></div>' +
           '<div class="footer">' +
             '<div class="buttons left">' +
               '<button type="button" class="btn delete" data-post-office-delete-field></button>' +
             '</div>' +
             '<div class="buttons right">' +
-              '<button type="button" class="btn submit"></button>' +
+              '<button type="button" class="btn submit" data-post-office-save-field></button>' +
             '</div>' +
           '</div>' +
         '</div>'
       ).appendTo(Garnish.$bod);
 
+      $modal.find('[data-post-office-close-field]').attr('aria-label', Craft.t('post-office', 'Close'));
       $modal.find('[data-post-office-delete-field]').text(Craft.t('post-office', 'Delete'));
-      $modal.find('.submit').text(Craft.t('post-office', 'Done'));
+      $modal.find('[data-post-office-save-field]').text(Craft.t('post-office', 'Save'));
 
       this.$modalBody = $modal.find('.body');
 
@@ -129,26 +199,82 @@
         autoShow: false,
         hideOnEsc: true,
         hideOnShadeClick: true,
-        onHide: $.proxy(this, 'closeField'),
+        onHide: $.proxy(this, 'onModalHide'),
       });
 
-      this.addListener($modal.find('.submit'), 'activate', function () {
-        this.modal.hide();
-      });
-
+      this.addListener($modal.find('[data-post-office-save-field]'), 'activate', 'saveField');
+      this.addListener($modal.find('[data-post-office-close-field]'), 'activate', 'cancelField');
       this.addListener($modal.find('[data-post-office-delete-field]'), 'activate', 'deleteField');
     },
 
-    closeField: function () {
+    /**
+     * Keeps what was typed, and closes.
+     */
+    saveField: function () {
+      this.committing = true;
+      this.modal.hide();
+    },
+
+    /**
+     * Closes without keeping anything. Also what ESC and a click on the shade do.
+     */
+    cancelField: function () {
+      this.committing = false;
+      this.modal.hide();
+    },
+
+    onModalHide: function () {
+      var committing = this.committing;
+
+      this.committing = false;
+
       if (!this.$openRow) {
+        return;
+      }
+
+      if (committing) {
+        this.commitField();
+
+        return;
+      }
+
+      this.discardField();
+    },
+
+    commitField: function () {
+      var $settings = this.$modalBody.children('[data-post-office-field-settings]');
+
+      this.$openRow.append($settings.addClass('hidden'));
+      // The row has been through the modal at least once now, so cancelling a later edit
+      // puts the old values back rather than throwing the field away.
+      this.$openRow.removeAttr('data-post-office-new');
+      this.updateRowSummary(this.$openRow);
+      this.$openRow = null;
+      this.restorePoint = null;
+    },
+
+    discardField: function () {
+      var $row = this.$openRow;
+
+      this.$openRow = null;
+
+      // A field that has never been saved has nothing to go back to, so cancelling it means
+      // the field itself goes away.
+      if ($row.is('[data-post-office-new]')) {
+        this.$modalBody.empty();
+        this.restorePoint = null;
+        this.removeRow($row);
+
         return;
       }
 
       var $settings = this.$modalBody.children('[data-post-office-field-settings]');
 
-      this.$openRow.append($settings.addClass('hidden'));
-      this.updateRowSummary(this.$openRow);
-      this.$openRow = null;
+      this.applyRestorePoint(this.restorePoint);
+      this.restorePoint = null;
+
+      $row.append($settings.addClass('hidden'));
+      this.updateRowSummary($row);
     },
 
     deleteField: function () {
@@ -159,9 +285,14 @@
       var $row = this.$openRow;
 
       this.$openRow = null;
+      this.restorePoint = null;
       this.$modalBody.empty();
       this.modal.hide();
 
+      this.removeRow($row);
+    },
+
+    removeRow: function ($row) {
       this.sorter.removeItems($row);
       $row.remove();
     },
